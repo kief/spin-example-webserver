@@ -10,10 +10,10 @@ TERRAFORM_VARS=-var "env_name=$(ENV)" \
 	-var "component_base=$(COMPONENT_BASE)" \
 	-var "estate_id=$(ESTATE_ID)" \
 	-var "private_domain_name=$(DOMAIN_NAME)"
-
+TERRAFORM=$(MY_DIR)/../bin/terraform
 
 init: .work/keypair.pub
-	cd ./src && terraform init -input=false -upgrade=true -force-copy \
+	cd ./src && $(TERRAFORM) init -input=false -upgrade=true -force-copy \
 		-backend-config="bucket=$(STATE_BUCKET_NAME)" \
 		-backend-config="key=estate-$(ESTATE_ID)/component-$(COMPONENT_BASE)/environment-$(ENV)/infra.tfstate" \
 		-backend-config="region=$(REGION)"
@@ -24,22 +24,22 @@ init: .work/keypair.pub
 
 out:
 	@echo "TERRAFORM_VARS=$(TERRAFORM_VARS)"
-	cd ./src && terraform output $(TERRAFORM_VARS)
+	cd ./src && $(TERRAFORM) output $(TERRAFORM_VARS)
 
 prepare: clean validate ## Prepare for packaging, including running local tests
 
 validate: local-init
-	cd ./src && terraform validate $(TERRAFORM_VARS)
+	cd ./src && $(TERRAFORM) validate $(TERRAFORM_VARS)
 	@echo "Apparently no complaints about the terraform file syntax"
 
 local-init:
-	cd ./src && terraform init -backend=false -input=false -upgrade=true
+	cd ./src && $(TERRAFORM) init -backend=false -input=false -upgrade=true
 
 plan: init ## Preview changes without applying them
-	cd ./src && terraform plan $(TERRAFORM_VARS)
+	cd ./src && $(TERRAFORM) plan $(TERRAFORM_VARS)
 
 up: init ## Create or update the stack
-	cd ./src && terraform apply $(TERRAFORM_VARS) -auto-approve
+	cd ./src && $(TERRAFORM) apply $(TERRAFORM_VARS) -auto-approve
 
 test: test-init ## Test the stack
 	cd ./test && ENV=$(ENV) bundle exec rspec spec/*_spec.rb
@@ -55,7 +55,7 @@ teardown: destroy ## Destroy the ephemeral elements of the stack, but leave the 
 destroy: run-destroy clean ## Destroy the ephemeral and persistent elements of the stack
 
 run-destroy: init
-	cd ./src && terraform destroy $(TERRAFORM_VARS) -force
+	cd ./src && $(TERRAFORM) destroy $(TERRAFORM_VARS) -force
 
 clean: ## Clean the local working environment, leave the stack alone
 	rm -rf ./src/.terraform ./src/*tfstate* ./.work ./package

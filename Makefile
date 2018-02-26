@@ -5,15 +5,22 @@ include $(MY_DIR)/project-variables.mk
 
 setup: setup-code-repository import-sourcode setup-pipelines ## Create code repo and pipeline, and import the source
 
-build: ## Prepare the infrastructure code
+build: bin/terraform ## Prepare the infrastructure code
 	cd infra && make prepare
 
-package: local-clean ## Create a versioned artefact
+bin/terraform:
+	mkdir -p ./bin
+	mkdir -p ./.work
+	cd ./.work && curl -LfOs https://releases.hashicorp.com/terraform/$(TERRAFORM_VERSION)/terraform_$(TERRAFORM_VERSION)_linux_amd64.zip
+	unzip .work/terraform_$(TERRAFORM_VERSION)_linux_amd64.zip -d ./bin/
+
+package: local-clean build ## Create a versioned artefact
 	mkdir -p ./package
 	tar czf ./package/${ARTEFACT_NAME}-${BUILD_VERSION}.tgz \
 		--exclude .git \
 		--exclude .gitignore \
 		--exclude ./package \
+		--exclude ./.work \
 		.
 
 setup-code-repository:
@@ -34,7 +41,7 @@ teardown: ## Destroys the project's source code and artefacts. Does not destroy 
 	@echo "WARNING: Instances of the infrastructure could still exist"
 
 local-clean:
-	rm -rf ./package
+	rm -rf ./package ./.work ./bin
 
 clean: local-clean ## Clean local packaging. Does not clean sub-projects
 	cd infra && make clean

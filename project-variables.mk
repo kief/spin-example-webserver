@@ -1,4 +1,6 @@
 
+TERRAFORM_VERSION=0.11.3
+
 ESTATE_ID=cloudspin-reference
 DOMAIN_NAME=cloudspin.net
 COMPONENT_BASE=simple-env
@@ -14,4 +16,4 @@ ARTEFACT_BUCKET_NAME=spin-artefacts-$(AWS_ACCOUNT_ID)
 ENV?=default
 
 ARTEFACT_NAME=$(COMPONENT_BASE)
-BUILD_VERSION="1.0.$(shell date +%Y%m%d%I%M%S)"
+BUILD_VERSION=1.0.$(shell date +%Y%m%d%I%M%S)
