@@ -38,22 +38,12 @@ $(SSH_CONFIGURED_FOR_CODECOMMIT):
 	@echo "" >> $(HOME)/.ssh/config
 	touch $(SSH_CONFIGURED_FOR_CODECOMMIT)
 
-# import: git-client ../infra/.git/spin-import-completed ## Import source code into CodeCommit
-import: git-client add-origin ## Import source code into CodeCommit
+import: git-client add-upstream ## Import source code into CodeCommit
 
-add-origin:
-	cd ../.. && git remote add codecommit $(GIT_CLONE_URL)
-	cd ../.. && git remote -v
-	cd ../.. && git push -u codecommit master
-
-../infra/.git/spin-import-completed:
-	cd ../infra && git init
-	cd ../infra && git add .
-	cd ../infra && git diff-index --quiet HEAD || git commit -m "Automatic import of the infrastructure code"
-	cd ../infra && git remote add origin $(GIT_CLONE_URL)
-	cd ../infra && git remote -v
-	cd ../infra && git push -u origin master
-	touch ../infra/.git/spin-import-completed
+add-upstream:
+	cd .. && git remote add codecommit $(GIT_CLONE_URL)
+	cd .. && git remote -v
+	cd .. && git push -u codecommit master
 
 test: clean-test ## Test the infrastructure
 	cd ./test && ./check_git_repo.sh $(GIT_CLONE_URL)
