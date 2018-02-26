@@ -9,10 +9,10 @@ phases:
       - echo Nothing to do in the pre_build phase...
   build:
     commands:
-      - make validate
+      - make build
   post_build:
     commands:
       - make package
 artifacts:
   files:
-    - src/backend.tf
+    - package/simple-env-*.tgz

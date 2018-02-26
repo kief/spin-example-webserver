@@ -1,6 +1,20 @@
 .DEFAULT_GOAL := help
 
-setup: setup-code-repository import-sourcode setup-pipelines ## Create a CodeCommit repo and import the project code
+MY_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+include $(MY_DIR)/project-variables.mk
+
+setup: setup-code-repository import-sourcode setup-pipelines ## Create code repo and pipeline, and import the source
+
+build: ## Prepare the infrastructure code
+	cd infra && make prepare
+
+package: local-clean ## Create a versioned artefact
+	mkdir -p ./package
+	tar czf ./package/${ARTEFACT_NAME}-${BUILD_VERSION}.tgz \
+		--exclude .git \
+		--exclude .gitignore \
+		--exclude ./package \
+		.
 
 setup-code-repository:
 	cd code-repository && make apply
@@ -18,6 +32,14 @@ teardown: ## Destroys the project's source code and artefacts. Does not destroy 
 	cd code-repository && make destroy
 	rm -rf infra/.git
 	@echo "WARNING: Instances of the infrastructure could still exist"
+
+local-clean:
+	rm -rf ./package
+
+clean: local-clean ## Clean local packaging. Does not clean sub-projects
+	cd infra && make clean
+	cd pipeline && make clean
+	cd code-repository && make clean
 
 help:
 	@grep -h -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'

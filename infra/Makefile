@@ -26,10 +26,14 @@ out:
 	@echo "TERRAFORM_VARS=$(TERRAFORM_VARS)"
 	cd ./src && terraform output $(TERRAFORM_VARS)
 
-validate:
-	cd ./src && terraform init -backend=false -input=false -upgrade=true
+prepare: clean validate ## Prepare for packaging, including running local tests
+
+validate: local-init
 	cd ./src && terraform validate $(TERRAFORM_VARS)
 	@echo "Apparently no complaints about the terraform file syntax"
+
+local-init:
+	cd ./src && terraform init -backend=false -input=false -upgrade=true
 
 plan: init ## Preview changes without applying them
 	cd ./src && terraform plan $(TERRAFORM_VARS)
@@ -45,16 +49,6 @@ test-init:
 
 update-test-gems:
 	cd ./test && bundle update
-
-package: clean ## Create a versioned artefact
-	mkdir -p ./package
-	cd ./src && terraform init -backend=false -input=false -upgrade=true
-	cd .. && tar czf ./infra/package/${ARTEFACT_NAME}-${BUILD_VERSION}.tgz \
-		--exclude ./infra/.git \
-		--exclude ./infra/.gitignore \
-		--exclude ./infra/package \
-		./project-variables.mk \
-		./infra
 
 teardown: destroy ## Destroy the ephemeral elements of the stack, but leave the persistent elements
 
