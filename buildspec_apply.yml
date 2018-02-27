@@ -3,7 +3,7 @@ version: 0.2
 phases:
   install:
     commands:
-      - tar xzvf simple-env-*.tgz
+      - tar xzvf package/simple-env-*.tgz
   pre_build:
     commands:
       - make plan ENV=testapply
