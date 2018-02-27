@@ -23,6 +23,15 @@ package: local-clean build ## Create a versioned artefact
 		--exclude ./.work \
 		.
 
+plan:
+	cd infra && make plan ENV=$(ENV)
+
+up:
+	cd infra && make up ENV=$(ENV)
+
+test:
+	cd infra && make test ENV=$(ENV)
+
 setup-code-repository:
 	cd code-repository && make apply
 

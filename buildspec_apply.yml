@@ -1,0 +1,16 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo Nothing to do in the install phase...
+  pre_build:
+    commands:
+      - make plan ENV=testapply
+  build:
+    commands:
+      - make up ENV=testapply
+  post_build:
+    commands:
+      - make test ENV=testapply
+

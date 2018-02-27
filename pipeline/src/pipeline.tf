@@ -32,20 +32,39 @@ resource "aws_codepipeline" "simple_env_pipeline" {
   }
 
   stage {
-    name = "Build"
+    name = "Package"
 
     action {
-      name            = "Build"
+      name            = "Package"
       category        = "Build"
       owner           = "AWS"
       provider        = "CodeBuild"
       version         = "1"
 
       input_artifacts = [ "simple-env-infra-source" ]
-      output_artifacts  = [ "simple-env-infra-package" ],
+      output_artifacts  = [ "simple-env-infra-package" ]
 
       configuration {
         ProjectName = "${aws_codebuild_project.simple-env-packaging-project.name}"
+      }
+    }
+  }
+
+  stage {
+    name = "TestApply"
+
+    action {
+      name            = "TestApply"
+      category        = "Build"
+      owner           = "AWS"
+      provider        = "CodeBuild"
+      version         = "1"
+
+      input_artifacts = [ "simple-env-infra-package" ]
+      output_artifacts  = [ "simple-env-testapply-results" ]
+
+      configuration {
+        ProjectName = "${aws_codebuild_project.simple-env-testapply-project.name}"
       }
     }
   }

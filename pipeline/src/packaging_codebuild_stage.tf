@@ -18,9 +18,5 @@ resource "aws_codebuild_project" "simple-env-packaging-project" {
   artifacts {
     type = "CODEPIPELINE"
   }
-
-  tags {
-    "Environment" = "Test"
-  }
 }
 
