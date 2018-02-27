@@ -43,7 +43,7 @@ resource "aws_codepipeline" "simple_env_pipeline" {
       version         = "1"
 
       configuration {
-        ProjectName = "build-simple-env"
+        ProjectName = "${aws_codebuild_project.simple-env-packaging-project.name}"
       }
     }
   }

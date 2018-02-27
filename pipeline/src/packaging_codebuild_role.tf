@@ -1,6 +1,6 @@
 
-resource "aws_iam_role" "simple_env_codebuild_role" {
-  name = "simple_env_codebuild_role"
+resource "aws_iam_role" "simple_env_packaging_codebuild_role" {
+  name = "SimpleEnv_Packaging_Codebuild_Role"
 
   assume_role_policy = <<EOF
 {
@@ -18,15 +18,17 @@ resource "aws_iam_role" "simple_env_codebuild_role" {
 EOF
 }
 
+
 resource "aws_iam_role_policy_attachment" "allow_codebuild_to_use_codecommit" {
-  role       = "${aws_iam_role.simple_env_codebuild_role.name}"
+  role       = "${aws_iam_role.simple_env_packaging_codebuild_role.name}"
   policy_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/spin/simple_env/SimpleEnv_CodeRepository_PipelineCheckout"
 }
 
-resource "aws_iam_policy" "simple_env_codebuild_policy" {
-  name        = "simple_env_codebuild_policy"
+
+resource "aws_iam_policy" "simple_env_packaging_codebuild_policy" {
+  name        = "SimpleEnv_Packaging_Codebuild_Policy"
   path        = "/service-role/"
-  description = "Policy used in trust relationship with CodeBuild"
+  description = "Policies needed by the CodeBuild project for Packaging the SimpleEnv project"
 
   policy = <<POLICY
 {
@@ -59,10 +61,9 @@ POLICY
 }
 
 
-resource "aws_iam_policy_attachment" "simple_env_codebuild_attachment" {
-  name       = "simple_env_codebuild_attachment"
-  policy_arn = "${aws_iam_policy.simple_env_codebuild_policy.arn}"
-  roles      = ["${aws_iam_role.simple_env_codebuild_role.id}"]
+resource "aws_iam_policy_attachment" "simple_env_packaging_codebuild_attachment" {
+  name       = "SimpleEnv_Packaging_Codebuild_Attachment"
+  policy_arn = "${aws_iam_policy.simple_env_packaging_codebuild_policy.arn}"
+  roles      = ["${aws_iam_role.simple_env_packaging_codebuild_role.id}"]
 }
-
 

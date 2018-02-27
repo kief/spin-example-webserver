@@ -1,9 +1,9 @@
 
-resource "aws_codebuild_project" "build-simple-env" {
-  name         = "build-simple-env"
-  description  = "codebuild for simple-env"
+resource "aws_codebuild_project" "simple-env-packaging-project" {
+  name         = "SimpleEnv_Packaging_Project"
+  description  = "CodeBuild project to package the simple-env codebase"
   build_timeout      = "5"
-  service_role = "${aws_iam_role.simple_env_codebuild_role.arn}"
+  service_role = "${aws_iam_role.simple_env_packaging_codebuild_role.arn}"
 
   artifacts {
     type = "NO_ARTIFACTS"
