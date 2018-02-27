@@ -32,6 +32,9 @@ up:
 test:
 	cd infra && make test ENV=$(ENV)
 
+destroy:
+	cd infra && make destroy ENV=$(ENV)
+
 setup-code-repository:
 	cd code-repository && make apply
 

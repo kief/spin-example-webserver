@@ -3,14 +3,14 @@ version: 0.2
 phases:
   install:
     commands:
-      - echo Nothing to do in the install phase...
+      - tar xzvf simple-env-*.tgz
   pre_build:
     commands:
       - make plan ENV=testapply
   build:
     commands:
       - make up ENV=testapply
+      - make test ENV=testapply
   post_build:
     commands:
-      - make test ENV=testapply
-
+      - make destroy ENV=testapply
