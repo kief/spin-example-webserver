@@ -39,8 +39,10 @@ resource "aws_codepipeline" "simple_env_pipeline" {
       category        = "Build"
       owner           = "AWS"
       provider        = "CodeBuild"
-      input_artifacts = [ "simple-env-infra-source" ]
       version         = "1"
+
+      input_artifacts = [ "simple-env-infra-source" ]
+      output_artifacts  = [ "simple-env-infra-package" ],
 
       configuration {
         ProjectName = "${aws_codebuild_project.simple-env-packaging-project.name}"
