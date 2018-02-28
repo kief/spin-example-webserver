@@ -17,3 +17,4 @@ artifacts:
   files:
     - package/simple-env-*.tgz
     - buildspec_apply.yml
+    - buildspec_testapply.yml
