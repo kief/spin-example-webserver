@@ -1,7 +1,7 @@
 
-resource "aws_codebuild_project" "simple-env-testapply-project" {
-  name         = "SimpleEnv_TestApply_Project"
-  description  = "CodeBuild project to test applying the simple-env infrastructure"
+resource "aws_codebuild_project" "simple-env-prodapply-project" {
+  name         = "SimpleEnv_ProdApply_Project"
+  description  = "CodeBuild project to apply terraform to the simple-env production instance"
   build_timeout      = "10"
   service_role = "${aws_iam_role.simple_env_terraform_codebuild_role.arn}"
 
@@ -12,14 +12,14 @@ resource "aws_codebuild_project" "simple-env-testapply-project" {
 
     environment_variable {
       "name"  = "ENV"
-      "value" = "testapply"
+      "value" = "prodapply"
     }
 
   }
 
   source {
     type = "CODEPIPELINE"
-    buildspec = "buildspec_testapply.yml"
+    buildspec = "buildspec_apply.yml"
   }
 
   artifacts {

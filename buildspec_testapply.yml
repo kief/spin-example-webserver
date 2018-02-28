@@ -14,7 +14,8 @@ phases:
   build:
     commands:
       - make up
+      - make test
 
   post_build:
     commands:
-      - echo "Done"
+      - make destroy

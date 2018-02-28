@@ -13,10 +13,10 @@ resource "aws_codepipeline" "simple_env_pipeline" {
   }
 
   stage {
-    name = "Source"
+    name = "Checkout"
 
     action {
-      name             = "Source"
+      name             = "Checkout"
       category         = "Source"
       owner            = "AWS"
       provider         = "CodeCommit"
@@ -65,6 +65,25 @@ resource "aws_codepipeline" "simple_env_pipeline" {
 
       configuration {
         ProjectName = "${aws_codebuild_project.simple-env-testapply-project.name}"
+      }
+    }
+  }
+
+  stage {
+    name = "ProdApply"
+
+    action {
+      name            = "ProdApply"
+      category        = "Build"
+      owner           = "AWS"
+      provider        = "CodeBuild"
+      version         = "1"
+
+      input_artifacts = [ "simple-env-infra-package" ]
+      output_artifacts  = [ "simple-env-prodapply-results" ]
+
+      configuration {
+        ProjectName = "${aws_codebuild_project.simple-env-prodapply-project.name}"
       }
     }
   }

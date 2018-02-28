@@ -1,6 +1,6 @@
 
-resource "aws_iam_role" "simple_env_testapply_codebuild_role" {
-  name = "SimpleEnv_TestApply_Codebuild_Role"
+resource "aws_iam_role" "simple_env_terraform_codebuild_role" {
+  name = "SimpleEnv_TestApply_Terraform_Role"
 
   assume_role_policy = <<EOF
 {
@@ -19,8 +19,8 @@ EOF
 }
 
 
-resource "aws_iam_policy" "simple_env_testapply_codebuild_policy" {
-  name        = "SimpleEnv_TestApply_Codebuild_Policy"
+resource "aws_iam_policy" "simple_env_terraform_codebuild_policy" {
+  name        = "SimpleEnv_TestApply_Terraform_Policy"
   path        = "/service-role/"
   description = "Policies needed by the CodeBuild project for TestApply the SimpleEnv project"
 
@@ -57,15 +57,15 @@ POLICY
 }
 
 
-resource "aws_iam_policy_attachment" "simple_env_testapply_codebuild_attachment" {
-  name       = "SimpleEnv_TestApply_Codebuild_Attachment"
-  policy_arn = "${aws_iam_policy.simple_env_testapply_codebuild_policy.arn}"
-  roles      = ["${aws_iam_role.simple_env_testapply_codebuild_role.id}"]
+resource "aws_iam_policy_attachment" "simple_env_terraform_codebuild_attachment" {
+  name       = "SimpleEnv_TestApply_Terraform_Attachment"
+  policy_arn = "${aws_iam_policy.simple_env_terraform_codebuild_policy.arn}"
+  roles      = ["${aws_iam_role.simple_env_terraform_codebuild_role.id}"]
 }
 
-resource "aws_iam_policy_attachment" "simple_env_testapply_terraform_attachment" {
-  name       = "SimpleEnv_TestApply_Terraform_Attachment"
+
+resource "aws_iam_role_policy_attachment" "simple_env_terraform_terraform_attachment" {
   policy_arn = "arn:aws:iam::aws:policy/PowerUserAccess"
-  roles      = ["${aws_iam_role.simple_env_testapply_codebuild_role.id}"]
+  role      = "${aws_iam_role.simple_env_terraform_codebuild_role.id}"
 }
 
