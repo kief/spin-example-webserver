@@ -22,8 +22,10 @@ init: .work/keypair.pub
 	mkdir -p .work
 	ssh-keygen -N '' -f .work/keypair -b 4096
 
-out:
+vars:
 	@echo "TERRAFORM_VARS=$(TERRAFORM_VARS)"
+
+out: vars
 	cd ./src && $(TERRAFORM) output $(TERRAFORM_VARS)
 
 prepare: clean validate ## Prepare for packaging, including running local tests
@@ -35,7 +37,7 @@ validate: local-init
 local-init:
 	cd ./src && $(TERRAFORM) init -backend=false -input=false -upgrade=true
 
-plan: init out ## Preview changes without applying them
+plan: init vars ## Preview changes without applying them
 	cd ./src && $(TERRAFORM) plan $(TERRAFORM_VARS)
 
 up: init ## Create or update the stack
