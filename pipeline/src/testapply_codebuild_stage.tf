@@ -9,6 +9,12 @@ resource "aws_codebuild_project" "simple-env-testapply-project" {
     compute_type = "BUILD_GENERAL1_SMALL"
     image        = "aws/codebuild/golang:1.7.3"
     type         = "LINUX_CONTAINER"
+
+    environment_variable {
+      "name"  = "ENV"
+      "value" = "testapply"
+    }
+
   }
 
   source {

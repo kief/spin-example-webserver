@@ -13,13 +13,13 @@ phases:
 
   pre_build:
     commands:
-      - make plan ENV=testapply
+      - make plan
 
   build:
     commands:
-      - make up ENV=testapply
-      - make test ENV=testapply
+      - make up
+      - make test
 
   post_build:
     commands:
-      - make destroy ENV=testapply
+      - make destroy
