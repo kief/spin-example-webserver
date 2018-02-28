@@ -63,3 +63,9 @@ resource "aws_iam_policy_attachment" "simple_env_testapply_codebuild_attachment"
   roles      = ["${aws_iam_role.simple_env_testapply_codebuild_role.id}"]
 }
 
+resource "aws_iam_policy_attachment" "simple_env_testapply_terraform_attachment" {
+  name       = "SimpleEnv_TestApply_Terraform_Attachment"
+  policy_arn = "arn:aws:iam::aws:policy/PowerUserAccess"
+  roles      = ["${aws_iam_role.simple_env_testapply_codebuild_role.id}"]
+}
+
