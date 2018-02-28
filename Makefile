@@ -24,16 +24,16 @@ package: local-clean build ## Create a versioned artefact
 		.
 
 plan:
-	cd infra && make plan ENV=$(ENV)
+	cd infra && make plan
 
 up:
-	cd infra && make up ENV=$(ENV)
+	cd infra && make up
 
 test:
-	cd infra && make test ENV=$(ENV)
+	cd infra && make test
 
 destroy:
-	cd infra && make destroy ENV=$(ENV)
+	cd infra && make destroy
 
 setup-code-repository:
 	cd code-repository && make apply
