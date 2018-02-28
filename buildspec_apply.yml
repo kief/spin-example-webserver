@@ -3,17 +3,8 @@ version: 0.2
 phases:
   install:
     commands:
-      - apt-get install -y python2.7 python-pip
-      - update-alternatives --install /usr/bin/python python /usr/bin/python2.7 10
-      - apt-get install -y software-properties-common
-      - apt-get install apt-transport-https
-      - apt-add-repository -y ppa:brightbox/ruby-ng
       - apt-get update -y
       - apt-get install -y openssh-client
-      - apt-get install -y ruby2.3 ruby2.3-dev liblzma-dev zlib1g-dev
-      - update-alternatives --install /usr/bin/ruby ruby /usr/bin/ruby2.3 10
-      - update-alternatives --install /usr/bin/gem gem /usr/bin/gem2.3 10
-      - gem install bundler
       - tar xzvf package/simple-env-*.tgz
 
   pre_build:

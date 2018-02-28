@@ -7,7 +7,7 @@ resource "aws_codebuild_project" "simple-env-testapply-project" {
 
   environment {
     compute_type = "BUILD_GENERAL1_SMALL"
-    image        = "aws/codebuild/golang:1.7.3"
+    image        = "aws/codebuild/ruby:2.3.1"
     type         = "LINUX_CONTAINER"
 
     environment_variable {
