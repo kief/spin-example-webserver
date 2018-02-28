@@ -35,7 +35,7 @@ validate: local-init
 local-init:
 	cd ./src && $(TERRAFORM) init -backend=false -input=false -upgrade=true
 
-plan: init ## Preview changes without applying them
+plan: init out ## Preview changes without applying them
 	cd ./src && $(TERRAFORM) plan $(TERRAFORM_VARS)
 
 up: init ## Create or update the stack
