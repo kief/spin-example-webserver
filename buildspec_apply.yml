@@ -3,6 +3,10 @@ version: 0.2
 phases:
   install:
     commands:
+      - apt-get install -y python2.7 python-pip
+      - update-alternatives --install /usr/bin/python python /usr/bin/python2.7 10
+      - apt-get install -y software-properties-common
+      - apt-get install apt-transport-https
       - apt-add-repository -y ppa:brightbox/ruby-ng
       - apt-get update -y
       - apt-get install -y openssh-client
