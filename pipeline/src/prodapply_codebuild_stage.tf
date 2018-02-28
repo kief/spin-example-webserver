@@ -12,7 +12,7 @@ resource "aws_codebuild_project" "simple-env-prodapply-project" {
 
     environment_variable {
       "name"  = "ENV"
-      "value" = "prodapply"
+      "value" = "prod"
     }
 
   }
