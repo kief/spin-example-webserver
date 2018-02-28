@@ -5,7 +5,6 @@ phases:
     commands:
       - apt-get update -y
       - apt-get install -y openssh-client
-      - gem install bundler
       - tar xzvf package/simple-env-*.tgz
 
   pre_build:
