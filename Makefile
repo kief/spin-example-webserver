@@ -19,6 +19,8 @@ package: local-clean build ## Create a versioned artefact
 	tar czf ./package/${ARTEFACT_NAME}-${BUILD_VERSION}.tgz \
 		--exclude .git \
 		--exclude .gitignore \
+		--exclude ./pipeline \
+		--exclude ./code-repository \
 		--exclude ./package \
 		--exclude ./.work \
 		.
