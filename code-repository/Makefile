@@ -6,7 +6,7 @@ include $(MY_DIR)/../project-variables.mk
 
 TERRAFORM_VARS=-var "git_ssh_keyfile=$(HOME)/.ssh/git_ssh.pub"
 GIT_CLONE_URL="$(shell cd ./src && terraform output git_ssh_url)"
-GIT_USERNAME="$(shell cd ./src && terraform output infra_tester_ssh_id)"
+GIT_USERNAME="$(shell cd ./src && terraform output committer_ssh_id)"
 SSH_CONFIGURED_FOR_CODECOMMIT=$(HOME)/.ssh/ssh_configured_for_$(ESTATE_ID)_$(COMPONENT_BASE)
 
 
