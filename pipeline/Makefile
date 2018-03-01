@@ -29,6 +29,9 @@ destroy: run-destroy clean ## Destroy the infrastructure
 run-destroy: init
 	cd ./src && terraform destroy -force $(TERRAFORM_VARS)
 
+wreck-all-environments:
+	cd ../infra && make destroy ENV=prod
+
 clean: ## Clean local working files
 	rm -rf ./src/.terraform ./src/*tfstate*
 
