@@ -48,13 +48,16 @@ plan: init vars ## Preview changes without applying them
 up: init ## Create or update the stack
 	cd ./src && $(TERRAFORM) apply $(TERRAFORM_VARS) -auto-approve
 
-test: test-init inspec ## Test the stack
-	cd ./test && ENV=$(ENV) bundle exec rspec spec/*_spec.rb
+test: awspec inspec ## Test the stack
 
-test-init:
-	cd ./test && bundle install
+awspec: awspec-init
+	cd ./test/awspec && ENV=$(ENV) bundle exec rspec spec/*_spec.rb
+
+awspec-init:
+	cd ./test/awspec && bundle install
 
 inspec:
+	mkdir -p ./.work
 	echo "environment : $(ENV)" > ./.work/env-attributes.yml
 	inspec exec \
 		test/inspec \
