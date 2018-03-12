@@ -6,7 +6,7 @@ resource "aws_instance" "application_server" {
   private_ip      = "10.1.1.11"
 
   tags {
-    Name = "application_server"
+    Name = "application_server-${var.env_name}"
     Environment = "${var.env_name}"
     Component = "${var.component_base}-${var.env_name}"
     Estate = "${var.estate_id}"

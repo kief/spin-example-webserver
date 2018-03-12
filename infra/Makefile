@@ -48,15 +48,18 @@ plan: init vars ## Preview changes without applying them
 up: init ## Create or update the stack
 	cd ./src && $(TERRAFORM) apply $(TERRAFORM_VARS) -auto-approve
 
-test: test-init ## Test the stack
+test: test-init inspec ## Test the stack
 	cd ./test && ENV=$(ENV) bundle exec rspec spec/*_spec.rb
 
 test-init:
 	cd ./test && bundle install
 
 inspec:
-	echo "$(ENV)"
-	inspec check test/simple-server
+	echo "environment : $(ENV)" > ./.work/env-attributes.yml
+	inspec exec \
+		test/inspec \
+		-t aws:// \
+		--attrs ./.work/env-attributes.yml
 
 update-test-gems:
 	cd ./test && bundle update
@@ -69,7 +72,10 @@ run-destroy: init
 	cd ./src && $(TERRAFORM) destroy $(TERRAFORM_VARS) -force
 
 clean: ## Clean the local working environment, leave the stack alone
-	rm -rf ./src/.terraform ./src/*tfstate* ./.work ./package
+	rm -rf ./src/.terraform \
+		./src/*tfstate* \
+		./.work \
+		./package
 
 help:
 	@echo "Set ENV= environment name instance. Defaults to \"$(ENV)\""
