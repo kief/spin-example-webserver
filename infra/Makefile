@@ -10,7 +10,12 @@ TERRAFORM_VARS=-var "env_name=$(ENV)" \
 	-var "component_base=$(COMPONENT_BASE)" \
 	-var "estate_id=$(ESTATE_ID)" \
 	-var "private_domain_name=$(DOMAIN_NAME)"
-TERRAFORM=$(MY_DIR)/../bin/terraform
+
+TERRAFORM=$(shell which terraform)
+ifeq ("$(TERRAFORM)","")
+  TERRAFORM=$(MY_DIR)/../bin/terraform
+endif
+
 
 init: .work/keypair.pub
 	cd ./src && $(TERRAFORM) init -input=false -upgrade=true -force-copy \
@@ -48,6 +53,10 @@ test: test-init ## Test the stack
 
 test-init:
 	cd ./test && bundle install
+
+inspec:
+	echo "$(ENV)"
+	inspec check test/simple-server
 
 update-test-gems:
 	cd ./test && bundle update
