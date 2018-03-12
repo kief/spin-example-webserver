@@ -6,4 +6,5 @@ environment = attribute('environment', default: 'unknown', description: 'Which e
 
 describe aws_ec2_instance(name: "application_server-#{environment}") do
   it { should be_running }
+  its('tags') { should include(key: 'Environment', value: environment) }
 end
