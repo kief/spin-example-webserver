@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'awspec'
 require 'aws-sdk'
 
-def named_ec2_instances_in_env(environment_name, name_tag)
+def ec2_instances_named_in_env(environment_name, name_tag)
   filters = [
     { name: 'instance-state-name', values: ['pending', 'running'] },
     { name: 'tag:Environment', values: [environment_name] },
