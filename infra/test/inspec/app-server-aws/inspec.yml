@@ -1,8 +1,8 @@
-name: simple-server
-title: InSpec Profile
-maintainer: The Authors
-copyright: The Authors
-copyright_email: you@example.com
+name: app-server-aws
+title: Controls for AWS resources for the app server
+maintainer: Kief Morris
+copyright: Kief Morris
+copyright_email: cloudspin@kief.com
 license: Apache-2.0
 summary: An InSpec Compliance Profile
 version: 0.1.0
