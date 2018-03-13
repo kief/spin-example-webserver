@@ -62,6 +62,7 @@ inspec:
 	inspec exec \
 		test/inspec \
 		-t aws:// \
+		--reporter json-rspec:./.work/inspec-output.json cli \
 		--attrs ./.work/env-attributes.yml
 
 update-test-gems:
