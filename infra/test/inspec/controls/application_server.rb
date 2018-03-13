@@ -4,7 +4,7 @@ title 'application server'
 
 environment = attribute('environment', default: 'unknown', description: 'Which environment to inspect')
 
-describe running_ec2_instances do
+describe aws_ec2_instances do
   it { should exist }
   its('states') { should include 'running' }
   its('count') { should eq 1 }

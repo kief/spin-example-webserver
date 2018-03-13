@@ -1,8 +1,8 @@
-class RunningEc2Instances < Inspec.resource(1)
-  name 'running_ec2_instances'
+class AwsEc2Instances < Inspec.resource(1)
+  name 'aws_ec2_instances'
   desc 'Verifies settings for a list of ec2 instances'
   example "
-    describe running_ec2_instances.where(thing: 'thing') do
+    describe aws_ec2_instances.where(thing: 'thing') do
       it { should exist }
       its('states') { should include 'running' }
       its('count') { should eq 1 }
@@ -27,7 +27,7 @@ class RunningEc2Instances < Inspec.resource(1)
 
   def validate_params(resource_params)
     unless resource_params.empty?
-      raise ArgumentError, 'running_ec2_instances does not accept resource parameters.'
+      raise ArgumentError, 'aws_ec2_instances does not accept resource parameters.'
     end
     resource_params
   end
