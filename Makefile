@@ -3,7 +3,9 @@
 MY_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 include $(MY_DIR)/project-variables.mk
 
-setup: setup-code-repository import-sourcode setup-pipelines ## Create code repo and pipeline, and import the source
+setup: setup-code-repository import-sourcode setup-pipeline ## Create code repo and pipeline, and import the source
+
+plan-setup: plan-code-repository plan-pipeline ## See what needs doing
 
 build: bin/terraform ## Prepare the infrastructure code
 	cd infra && make prepare
@@ -40,11 +42,17 @@ destroy:
 setup-code-repository:
 	cd code-repository && make apply
 
+plan-code-repository:
+	cd code-repository && make plan
+
 import-sourcode:
 	cd code-repository && make import
 
 setup-pipeline:
 	cd pipeline && make apply
+
+plan-pipeline:
+	cd pipeline && make plan
 
 teardown: ## Destroys the project's source code and artefacts. Does not destroy instances of the environment!
 	# Could destroy the infra for every environment, but how?

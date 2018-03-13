@@ -13,7 +13,7 @@ resource "aws_codepipeline" "simple_env_pipeline" {
   }
 
   stage {
-    name = "Checkout"
+    name = "CheckoutCode"
 
     action {
       name             = "Checkout"
@@ -32,7 +32,7 @@ resource "aws_codepipeline" "simple_env_pipeline" {
   }
 
   stage {
-    name = "Package"
+    name = "PackageArtefact"
 
     action {
       name            = "Package"
@@ -51,10 +51,10 @@ resource "aws_codepipeline" "simple_env_pipeline" {
   }
 
   stage {
-    name = "TestApply"
+    name = "ApplyToTestEnvironment"
 
     action {
-      name            = "TestApply"
+      name            = "ApplyToTestEnvironment"
       category        = "Build"
       owner           = "AWS"
       provider        = "CodeBuild"
@@ -70,10 +70,10 @@ resource "aws_codepipeline" "simple_env_pipeline" {
   }
 
   stage {
-    name = "ProdApply"
+    name = "ApplyToProdEnvironment"
 
     action {
-      name            = "ProdApply"
+      name            = "ApplyToProdEnvironment"
       category        = "Build"
       owner           = "AWS"
       provider        = "CodeBuild"
