@@ -6,6 +6,7 @@ class RunningEc2Instances < Inspec.resource(1)
       it { should exist }
       its('states') { should include 'running' }
       its('count') { should eq 1 }
+      its('image_id') { should include 'ami-63b0341a' }
     end
   "
 
@@ -18,6 +19,8 @@ class RunningEc2Instances < Inspec.resource(1)
         .add_accessor(:entries)
         .add(:count) { |x| x.entries.length }
         .add(:exists?) { |x| !x.entries.empty? }
+        .add(:image_id, field: :image_id)
+        .add(:tags, field: :tags)
         .add(:state_array, field: :state)
         .add(:states) { |x| x.entries.map { |e| e.state[:name] } }
   filter.connect(self, :table)
