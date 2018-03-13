@@ -18,6 +18,7 @@ endif
 
 
 init: .work/keypair.pub
+	rm -f ./src/.terraform/*tfstate*
 	cd ./src && $(TERRAFORM) init -input=false -upgrade=true -force-copy \
 		-backend-config="bucket=$(STATE_BUCKET_NAME)" \
 		-backend-config="key=estate-$(ESTATE_ID)/component-$(COMPONENT_BASE)/environment-$(ENV)/infra.tfstate" \
@@ -42,8 +43,11 @@ validate: local-init
 local-init:
 	cd ./src && $(TERRAFORM) init -backend=false -input=false -upgrade=true
 
+
 plan: init vars ## Preview changes without applying them
 	cd ./src && $(TERRAFORM) plan $(TERRAFORM_VARS)
+
+apply: up
 
 up: init ## Create or update the stack
 	cd ./src && $(TERRAFORM) apply $(TERRAFORM_VARS) -auto-approve
@@ -60,7 +64,7 @@ inspec:
 	mkdir -p ./.work
 	echo "environment : $(ENV)" > ./.work/env-attributes.yml
 	inspec exec \
-		test/inspec \
+		test/inspec/app-server-aws \
 		-t aws:// \
 		--reporter json-rspec:./.work/inspec-output.json cli \
 		--attrs ./.work/env-attributes.yml
