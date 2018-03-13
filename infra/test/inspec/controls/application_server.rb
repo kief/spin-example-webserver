@@ -6,6 +6,8 @@ environment = attribute('environment', default: 'unknown', description: 'Which e
 
 describe running_ec2_instances do
   it { should exist }
+  its('states') { should include 'running' }
+  its('count') { should eq 1 }
 end
 
 describe aws_ec2_instance(name: "application_server-#{environment}") do
