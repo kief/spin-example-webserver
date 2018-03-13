@@ -5,6 +5,7 @@ phases:
     commands:
       - apt-get update -y
       - apt-get install -y openssh-client
+      - gem install inspec
       - tar xzvf package/simple-env-*.tgz
 
   pre_build:
