@@ -62,6 +62,7 @@ run-destroy: init
 clean: clean-test ## Clean local working files
 	rm -rf ./src/.terraform ./src/*tfstate*
 
+# TODO: This conflicts with the host & bastion ssh stuff
 distclean: clean
 	rm -rf ../infra/.git
 	rm -f $(SSH_CONFIGURED_FOR_CODECOMMIT) ~/.ssh/config

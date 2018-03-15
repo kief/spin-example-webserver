@@ -2,6 +2,7 @@ variable "env_name" {}
 variable "estate_id" {}
 variable "component_base" {}
 variable "private_domain_name" {}
+variable "public_domain_name" {}
 
 variable "region" { default = "eu-west-1" }
 variable "availability_zones" { default = "eu-west-1a" }

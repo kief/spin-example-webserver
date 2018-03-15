@@ -6,15 +6,19 @@ include $(MY_DIR)/../project-variables.mk
 TERRAFORM_VARS=-var "env_name=$(ENV)" \
 	-var "allowed_cidr=$(MY_IP)/32" \
 	-var "provision_ssh_key=$(shell cat .work/keypair.pub)" \
-	-var "provision_ssh_key_file=.work/keypair.pub" \
+	-var "provision_ssh_key_file=$(shell pwd)/.work/keypair.pub" \
 	-var "component_base=$(COMPONENT_BASE)" \
 	-var "estate_id=$(ESTATE_ID)" \
-	-var "private_domain_name=$(DOMAIN_NAME)"
+	-var "public_domain_name=$(DOMAIN_NAME)" \
+	-var "private_domain_name=$(PRIVATE_DOMAIN_NAME)"
 
+# Use the terraform binary from the artefact if necessary
 TERRAFORM=$(shell which terraform)
 ifeq ("$(TERRAFORM)","")
   TERRAFORM=$(MY_DIR)/../bin/terraform
 endif
+
+SSH_CONFIGURED_FOR_BASTION=$(HOME)/.ssh/ssh_configured_for_bastion.$(ENV).$(DOMAIN_NAME)
 
 
 init: .work/keypair.pub
@@ -31,8 +35,12 @@ init: .work/keypair.pub
 vars:
 	@echo "TERRAFORM_VARS=$(TERRAFORM_VARS)"
 
-out: vars
-	cd ./src && $(TERRAFORM) output $(TERRAFORM_VARS)
+out: init vars
+	cd ./src && $(TERRAFORM) output
+	@echo "Yeah, this doesn't seem to work with remote state"
+
+show: init
+	cd ./src && $(TERRAFORM) show
 
 prepare: clean validate ## Prepare for packaging, including running local tests
 
@@ -60,14 +68,42 @@ awspec: awspec-init
 awspec-init:
 	cd ./test/awspec && bundle install
 
-inspec:
+inspec: inspec-aws # inspec-remote
+
+inspec-init:
 	mkdir -p ./.work
 	echo "environment : $(ENV)" > ./.work/env-attributes.yml
+
+inspec-aws: inspec-init
 	inspec exec \
 		test/inspec/app-server-aws \
 		-t aws:// \
 		--reporter json-rspec:./.work/inspec-output.json cli \
 		--attrs ./.work/env-attributes.yml
+
+inspec-remote: inspec-init $(SSH_CONFIGURED_FOR_BASTION)
+	inspec exec \
+		test/inspec/app-server-aws \
+		--host=$(APP_SERVER_HOST) \
+		--user=ubuntu \
+		--backend=ssh \
+		--key-files=.work/keypair.pub \
+		--reporter=json-rspec:./.work/inspec-output.json cli \
+		--attrs=./.work/env-attributes.yml
+
+$(SSH_CONFIGURED_FOR_BASTION):
+	@echo "" >> $(HOME)/.ssh/config
+	echo "# Automatically added by the $(COMPONENT_BASE) project" >> $(HOME)/.ssh/config
+	echo "Host *.$(ENV).$(DOMAIN_NAME)" >> $(HOME)/.ssh/config
+	@echo "  User ubuntu" >> $(HOME)/.ssh/config
+	@echo "  IdentityFile $(shell pwd)/.work/keypair.pub" >> $(HOME)/.ssh/config
+	@echo "  ProxyCommand ssh user@$(ENV)-bastion -W %h:%p" >> $(HOME)/.ssh/config
+	@echo "" >> $(HOME)/.ssh/config
+	@echo "Host $(ENV)-bastion" >> $(HOME)/.ssh/config
+	@echo "  User ubuntu" >> $(HOME)/.ssh/config
+	@echo "  IdentityFile $(shell pwd)/.work/keypair.pub" >> $(HOME)/.ssh/config
+	@echo "" >> $(HOME)/.ssh/config
+	touch $(SSH_CONFIGURED_FOR_BASTION)
 
 update-test-gems:
 	cd ./test && bundle update
@@ -79,11 +115,14 @@ destroy: run-destroy clean ## Destroy the ephemeral and persistent elements of t
 run-destroy: init
 	cd ./src && $(TERRAFORM) destroy $(TERRAFORM_VARS) -force
 
+# TODO: This conflicts with the codecommit git ssh stuff
 clean: ## Clean the local working environment, leave the stack alone
 	rm -rf ./src/.terraform \
 		./src/*tfstate* \
 		./.work \
-		./package
+		./package \
+		~/.ssh/config \
+		$(SSH_CONFIGURED_FOR_BASTION)
 
 help:
 	@echo "Set ENV= environment name instance. Defaults to \"$(ENV)\""

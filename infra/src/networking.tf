@@ -12,5 +12,5 @@ module "base-network" {
   deployment_identifier = "${var.env_name}"
   include_lifecycle_events = "no"
   
-  private_zone_id = "${aws_route53_zone.private_zone.zone_id}"
+  private_zone_id = "${module.dns-zones.private_zone_id}"
 }
