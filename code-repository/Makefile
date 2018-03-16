@@ -7,7 +7,7 @@ include $(MY_DIR)/../project-variables.mk
 TERRAFORM_VARS=-var "git_ssh_keyfile=$(HOME)/.ssh/git_ssh.pub"
 GIT_CLONE_URL="$(shell cd ./src && terraform output git_ssh_url)"
 GIT_USERNAME="$(shell cd ./src && terraform output committer_ssh_id)"
-SSH_CONFIGURED_FOR_CODECOMMIT=$(HOME)/.ssh/ssh_configured_for_$(ESTATE_ID)_$(COMPONENT_BASE)
+SSH_CONFIGURED_FOR_CODECOMMIT=$(HOME)/.ssh/ssh_configured_for_codecommit_$(ESTATE_ID)_$(COMPONENT_BASE)
 
 
 init: $(HOME)/.ssh/git_ssh.pub
@@ -29,7 +29,7 @@ git-client: $(SSH_CONFIGURED_FOR_CODECOMMIT)
 	git config --global user.name "$(GIT_USERNAME)"
 	git config --global push.default simple
 
-$(SSH_CONFIGURED_FOR_CODECOMMIT):
+$(SSH_CONFIGURED_FOR_CODECOMMIT): init
 	@echo "" >> $(HOME)/.ssh/config
 	echo "# Automatically added by the $(COMPONENT_BASE) project" >> $(HOME)/.ssh/config
 	echo "Host git-codecommit.*.amazonaws.com" >> $(HOME)/.ssh/config
