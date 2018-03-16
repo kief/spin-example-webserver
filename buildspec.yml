@@ -3,16 +3,21 @@ version: 0.2
 phases:
   install:
     commands:
-      - echo Nothing to do in the install phase...
+      - apt-get update -y
+      - apt-get install -y openssh-client
+
   pre_build:
     commands:
       - echo Nothing to do in the pre_build phase...
+
   build:
     commands:
       - make build
+
   post_build:
     commands:
       - make package
+
 artifacts:
   files:
     - package/simple-env-*.tgz
