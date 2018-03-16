@@ -70,6 +70,18 @@ resource "aws_codepipeline" "simple_env_pipeline" {
   }
 
   stage {
+    name = "ApproveForProduction"
+
+    action {
+      name            = "ApproveForProduction"
+      category        = "Approval"
+      provider        = "Manual"
+      owner           = "AWS"
+      version         = "1"
+    }
+  }
+
+  stage {
     name = "ApplyToProdEnvironment"
 
     action {
