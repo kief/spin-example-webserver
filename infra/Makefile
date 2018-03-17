@@ -19,6 +19,7 @@ ifeq ("$(TERRAFORM)","")
 endif
 
 SSH_CONFIGURED_FOR_BASTION=$(HOME)/.ssh/ssh_configured_for_bastion.$(ENV).$(DOMAIN_NAME)
+BASTION_PUBLIC_DNS=$(shell cd ./src && $(TERRAFORM) output bastion_public_dns)
 
 
 init: .work/keypair.pub
@@ -36,8 +37,8 @@ vars:
 	@echo "TERRAFORM_VARS=$(TERRAFORM_VARS)"
 
 out: init vars
+	cd ./src && $(TERRAFORM) refresh $(TERRAFORM_VARS)
 	cd ./src && $(TERRAFORM) output
-	@echo "Yeah, this doesn't seem to work with remote state"
 
 show: init
 	cd ./src && $(TERRAFORM) show
@@ -67,7 +68,7 @@ awspec: awspec-init
 awspec-init:
 	cd ./test/awspec && bundle install
 
-inspec: inspec-aws # inspec-remote
+inspec: inspec-aws # inspec-servers
 
 inspec-init:
 	mkdir -p ./.work
@@ -77,30 +78,31 @@ inspec-aws: inspec-init
 	inspec exec \
 		test/inspec/app-server-aws \
 		-t aws:// \
-		--reporter json-rspec:./.work/inspec-output.json cli \
+		--reporter json-rspec:./.work/inspec-app-server-aws.json cli \
 		--attrs ./.work/env-attributes.yml
 
-inspec-remote: inspec-init $(SSH_CONFIGURED_FOR_BASTION)
+inspec-servers: inspec-init $(SSH_CONFIGURED_FOR_BASTION)
 	inspec exec \
-		test/inspec/app-server-aws \
-		--host=$(APP_SERVER_HOST) \
+		test/inspec/bastion-server \
+		--host=$(BASTION_PUBLIC_DNS) \
 		--user=ubuntu \
 		--backend=ssh \
 		--key-files=.work/keypair.pub \
-		--reporter=json-rspec:./.work/inspec-output.json cli \
+		--reporter=json-rspec:./.work/inspec-bastion-server.json cli \
 		--attrs=./.work/env-attributes.yml
 
 $(SSH_CONFIGURED_FOR_BASTION):
 	@echo "" >> $(HOME)/.ssh/config
 	echo "# Automatically added by the $(COMPONENT_BASE) project" >> $(HOME)/.ssh/config
-	echo "Host *.$(ENV).$(DOMAIN_NAME)" >> $(HOME)/.ssh/config
+	@echo "" >> $(HOME)/.ssh/config
+	@echo "Host $(BASTION_PUBLIC_DNS)" >> $(HOME)/.ssh/config
+	@echo "  User ubuntu" >> $(HOME)/.ssh/config
+	@echo "  IdentityFile $(shell pwd)/.work/keypair.pub" >> $(HOME)/.ssh/config
+	@echo "" >> $(HOME)/.ssh/config
+	@echo "Host *.$(ENV).$(DOMAIN_NAME)" >> $(HOME)/.ssh/config
 	@echo "  User ubuntu" >> $(HOME)/.ssh/config
 	@echo "  IdentityFile $(shell pwd)/.work/keypair.pub" >> $(HOME)/.ssh/config
 	@echo "  ProxyCommand ssh user@$(ENV)-bastion -W %h:%p" >> $(HOME)/.ssh/config
-	@echo "" >> $(HOME)/.ssh/config
-	@echo "Host $(ENV)-bastion" >> $(HOME)/.ssh/config
-	@echo "  User ubuntu" >> $(HOME)/.ssh/config
-	@echo "  IdentityFile $(shell pwd)/.work/keypair.pub" >> $(HOME)/.ssh/config
 	@echo "" >> $(HOME)/.ssh/config
 	touch $(SSH_CONFIGURED_FOR_BASTION)
 

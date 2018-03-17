@@ -4,7 +4,6 @@ module "bastion_load_balancer" {
 
   region      = "${var.region}"
   vpc_id      = "${module.base-network.vpc_id}"
-  # subnet_ids  = "${module.base-network.public_subnet_ids}"
   subnet_ids  = ["${split(",", module.base-network.public_subnet_ids)}"]
   
   component             = "${var.component_base}-${var.env_name}"
@@ -31,7 +30,6 @@ module "bastion_load_balancer" {
     }
   ]
   
-  # egress_cidrs = "${module.base-network.private_subnet_cidr_blocks}"
   egress_cidrs = ["${split(",", module.base-network.private_subnet_cidr_blocks)}"]
   
   health_check_target               = "TCP:22"
