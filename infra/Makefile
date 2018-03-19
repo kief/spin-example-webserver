@@ -10,7 +10,7 @@ TERRAFORM_VARS=\
 	-var "role=$(ROLE)" \
 	-var "base_dns_domain=$(BASE_DNS_DOMAIN)" \
 	-var "allowed_cidr=$(MY_IP)/32" \
-	-var "provision_ssh_key_file=$(shell pwd)/.work/keypair.pub"
+	-var "provision_ssh_key_file=$(shell pwd)/$(BASTION_KEYPAIR_FILE).pub"
 
 # Use the terraform binary from the artefact if necessary
 TERRAFORM=$(shell which terraform)
@@ -22,16 +22,16 @@ SSH_CONFIGURED_FOR_BASTION=$(HOME)/.ssh/ssh_configured_for_bastion.$(DEPLOYMENT_
 BASTION_PUBLIC_DNS=$(shell cd ./src && $(TERRAFORM) output bastion_public_dns)
 
 
-init: .work/keypair.pub
+init: $(BASTION_KEYPAIR_FILE)
 	rm -f ./src/.terraform/*tfstate*
 	cd ./src && $(TERRAFORM) init -input=false -upgrade=true -force-copy \
 		-backend-config="bucket=$(STATE_BUCKET_NAME)" \
 		-backend-config="key=estate-$(ESTATE_ID)/component-$(COMPONENT)/deployment-$(DEPLOYMENT_ID)/$(ROLE).tfstate" \
 		-backend-config="region=$(REGION)"
 
-.work/keypair.pub:
+$(BASTION_KEYPAIR_FILE):
 	mkdir -p .work
-	ssh-keygen -N '' -f .work/keypair -b 4096
+	ssh-keygen -N '' -f $(BASTION_KEYPAIR_FILE) -b 4096
 
 vars:
 	@echo "TERRAFORM_VARS=$(TERRAFORM_VARS)"
@@ -49,7 +49,7 @@ validate: local-init
 	cd ./src && $(TERRAFORM) validate $(TERRAFORM_VARS)
 	@echo "Apparently no complaints about the terraform file syntax"
 
-local-init: .work/keypair.pub
+local-init: $(BASTION_KEYPAIR_FILE)
 	cd ./src && $(TERRAFORM) init -backend=false -input=false -upgrade=true
 
 plan: init vars ## Preview changes without applying them
@@ -89,7 +89,7 @@ inspec-servers: inspec-init $(SSH_CONFIGURED_FOR_BASTION)
 		--host=$(BASTION_PUBLIC_DNS) \
 		--user=ubuntu \
 		--backend=ssh \
-		--key-files=.work/keypair.pub \
+		--key-files=$(BASTION_KEYPAIR_FILE).pub \
 		--reporter=json-rspec:./.work/inspec-servers.json cli \
 		--attrs=./.work/env-attributes.yml
 
@@ -99,11 +99,11 @@ $(SSH_CONFIGURED_FOR_BASTION):
 	@echo "" >> $(HOME)/.ssh/config
 	@echo "Host $(BASTION_PUBLIC_DNS)" >> $(HOME)/.ssh/config
 	@echo "  User ubuntu" >> $(HOME)/.ssh/config
-	@echo "  IdentityFile $(shell pwd)/.work/keypair.pub" >> $(HOME)/.ssh/config
+	@echo "  IdentityFile $(shell pwd)/$(BASTION_KEYPAIR_FILE)" >> $(HOME)/.ssh/config
 	@echo "" >> $(HOME)/.ssh/config
 	@echo "Host *.$(DEPLOYMENT_ID).$(DOMAIN_NAME)" >> $(HOME)/.ssh/config
 	@echo "  User ubuntu" >> $(HOME)/.ssh/config
-	@echo "  IdentityFile $(shell pwd)/.work/keypair.pub" >> $(HOME)/.ssh/config
+	@echo "  IdentityFile $(shell pwd)/$(BASTION_KEYPAIR_FILE)" >> $(HOME)/.ssh/config
 	@echo "  ProxyCommand ssh user@$(DEPLOYMENT_ID)-bastion -W %h:%p" >> $(HOME)/.ssh/config
 	@echo "" >> $(HOME)/.ssh/config
 	touch $(SSH_CONFIGURED_FOR_BASTION)
