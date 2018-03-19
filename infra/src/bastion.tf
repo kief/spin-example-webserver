@@ -14,7 +14,7 @@ module "bastion" {
   
   ssh_public_key_path   = "${var.provision_ssh_key_file}"
   
-  allowed_cidrs         = ["${var.allowed_cidr}"]
+  allowed_cidrs         = ["${split(",", module.base-network.public_subnet_cidr_blocks)}"]
   egress_cidrs          = ["${split(",", module.base-network.private_subnet_cidr_blocks)}"]
   
   load_balancer_names   = ["${module.bastion_load_balancer.name}"]
