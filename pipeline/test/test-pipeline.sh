@@ -3,7 +3,7 @@
 
 set -eu
 
-PIPELINE_NAME=simple_env_pipeline
+PIPELINE_NAME=simple_stack_pipeline
 
 exit_good()
 {

@@ -8,8 +8,6 @@ def ec2_instances_named_in_deployment(deployment_identifier, name_tag)
     { name: 'tag:DeploymentIdentifier', values: [deployment_identifier] },
     { name: 'tag:Name', values: [name_tag] }
   ]
-puts "KSM: Filter: name: 'tag:DeploymentIdentifier', values: [#{deployment_identifier}]"
-puts "KSM: Filter: name: 'tag:Name', values: [#{name_tag}]"
   selected_ec2_instances(filters).map { |instance| 
     ec2(instance.instance_id)
   }

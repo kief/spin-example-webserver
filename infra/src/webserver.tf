@@ -1,5 +1,5 @@
 
-resource "aws_instance" "application_server" {
+resource "aws_instance" "webserver" {
 
   ami             = "${var.ami}"
   instance_type   = "t2.micro"

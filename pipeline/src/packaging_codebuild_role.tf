@@ -1,6 +1,6 @@
 
-resource "aws_iam_role" "simple_env_packaging_codebuild_role" {
-  name = "SimpleEnv_Packaging_Codebuild_Role"
+resource "aws_iam_role" "simple_stack_packaging_codebuild_role" {
+  name = "SimpleStack_Packaging_Codebuild_Role"
 
   assume_role_policy = <<EOF
 {
@@ -20,15 +20,15 @@ EOF
 
 
 resource "aws_iam_role_policy_attachment" "allow_codebuild_to_use_codecommit" {
-  role       = "${aws_iam_role.simple_env_packaging_codebuild_role.name}"
-  policy_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/spin/simple_env/SimpleEnv_CodeRepository_PipelineCheckout"
+  role       = "${aws_iam_role.simple_stack_packaging_codebuild_role.name}"
+  policy_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/spin/simple_stack/SimpleStack_CodeRepository_PipelineCheckout"
 }
 
 
-resource "aws_iam_policy" "simple_env_packaging_codebuild_policy" {
-  name        = "SimpleEnv_Packaging_Codebuild_Policy"
+resource "aws_iam_policy" "simple_stack_packaging_codebuild_policy" {
+  name        = "SimpleStack_Packaging_Codebuild_Policy"
   path        = "/service-role/"
-  description = "Policies needed by the CodeBuild project for Packaging the SimpleEnv project"
+  description = "Policies needed by the CodeBuild project for Packaging the SimpleStack project"
 
   policy = <<POLICY
 {
@@ -63,9 +63,9 @@ POLICY
 }
 
 
-resource "aws_iam_policy_attachment" "simple_env_packaging_codebuild_attachment" {
-  name       = "SimpleEnv_Packaging_Codebuild_Attachment"
-  policy_arn = "${aws_iam_policy.simple_env_packaging_codebuild_policy.arn}"
-  roles      = ["${aws_iam_role.simple_env_packaging_codebuild_role.id}"]
+resource "aws_iam_policy_attachment" "simple_stack_packaging_codebuild_attachment" {
+  name       = "SimpleStack_Packaging_Codebuild_Attachment"
+  policy_arn = "${aws_iam_policy.simple_stack_packaging_codebuild_policy.arn}"
+  roles      = ["${aws_iam_role.simple_stack_packaging_codebuild_role.id}"]
 }
 

@@ -3,8 +3,8 @@ TERRAFORM_VERSION=0.11.4
 
 DEPLOYMENT_ID?=default
 ESTATE_ID=cloudspin
-COMPONENT=simple
-ROLE=appserver
+COMPONENT=simple-stack
+ROLE=webserver
 BASE_DNS_DOMAIN=cloudspin.net
 
 REGION=eu-west-1

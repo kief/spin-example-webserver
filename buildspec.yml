@@ -20,6 +20,6 @@ phases:
 
 artifacts:
   files:
-    - package/simple-env-*.tgz
+    - package/simple-stack-*.tgz
     - buildspec_apply.yml
     - buildspec_testapply.yml

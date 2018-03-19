@@ -68,27 +68,29 @@ awspec: awspec-init
 awspec-init:
 	cd ./test/awspec && bundle install
 
-inspec: inspec-aws # inspec-servers
+inspec: inspec-infrastructure # inspec-servers
 
 inspec-init:
 	mkdir -p ./.work
 	echo "deployment_id : $(DEPLOYMENT_ID)" > ./.work/env-attributes.yml
+	echo "component : $(COMPONENT)" >> ./.work/env-attributes.yml
+	echo "role : $(ROLE)" >> ./.work/env-attributes.yml
 
-inspec-aws: inspec-init
+inspec-infrastructure: inspec-init
 	inspec exec \
-		test/inspec/app-server-aws \
+		test/inspec/infrastructure \
 		-t aws:// \
-		--reporter json-rspec:./.work/inspec-app-server-aws.json cli \
+		--reporter json-rspec:./.work/inspec-infrastructure.json cli \
 		--attrs ./.work/env-attributes.yml
 
 inspec-servers: inspec-init $(SSH_CONFIGURED_FOR_BASTION)
 	inspec exec \
-		test/inspec/bastion-server \
+		test/inspec/servers \
 		--host=$(BASTION_PUBLIC_DNS) \
 		--user=ubuntu \
 		--backend=ssh \
 		--key-files=.work/keypair.pub \
-		--reporter=json-rspec:./.work/inspec-bastion-server.json cli \
+		--reporter=json-rspec:./.work/inspec-servers.json cli \
 		--attrs=./.work/env-attributes.yml
 
 $(SSH_CONFIGURED_FOR_BASTION):

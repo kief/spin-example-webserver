@@ -1,5 +1,5 @@
 
-# spin-simple-environment
+# spin-simple-stack
 
 This is a reference infrastructure project which defines a standalone environment with a single server.
 
@@ -61,7 +61,7 @@ There is no data, and no per-instance configuration.
 
 # Usage
 
-To manage the project as an entity, use the Makefile in the base of the **simple-env** folder. Run `make` to see what it can do. This is about managing the project in source control and pipelines.
+To manage the project as an entity, use the Makefile in the base of the **simple-stack** folder. Run `make` to see what it can do. This is about managing the project in source control and pipelines.
 
-To manage an instance of the project (i.e. a server and its infrastructure), use the Makefile in the **simple-env/infra** folder. Run `make` without any arguments in that folder to see how to use it.
+To manage an instance of the project (i.e. a server and its infrastructure), use the Makefile in the **simple-stack/infra** folder. Run `make` without any arguments in that folder to see how to use it.
 
