@@ -6,7 +6,8 @@ deployment_id = attribute('deployment_id', default: 'unknown', description: 'Whi
 component = attribute('component', description: 'Which component things should be tagged')
 role = attribute('role', description: 'Which role things should be tagged')
 
-describe aws_ec2_instances(state_name: 'running') do
+describe aws_ec2_instances(state_name: 'running',
+      tag_value: "DeploymentIdentifier:#{deployment_id}" ) do
   it { should have_instances }
   its('count') { should eq 2 }
   # TODO: can we say something like 'should_only include'?

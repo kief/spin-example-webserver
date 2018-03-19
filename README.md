@@ -1,12 +1,7 @@
 
 # spin-simple-stack
 
-This is a reference infrastructure project which defines a standalone environment with a single server.
-
-
-# About the cloudspin reference infrastructure projects
-
-The cloudspin repositories are intended as a reference implementation for Infrastructure as Code using pipelines to manage changes.
+This is a reference infrastructure project which defines a simple, self-contained stack with a single server. The purpose is to explore project structures and tooling, to demonstrate the implementation of a pipeline for infrastructure, and to create a starting point for new projects.
 
 
 ## Purpose
