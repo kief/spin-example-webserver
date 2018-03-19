@@ -18,7 +18,7 @@ ifeq ("$(TERRAFORM)","")
   TERRAFORM=$(MY_DIR)/../bin/terraform
 endif
 
-SSH_CONFIGURED_FOR_BASTION=$(HOME)/.ssh/ssh_configured_for_bastion.$(DEPLOYMENT_ID).$(DOMAIN_NAME)
+SSH_CONFIGURED_FOR_BASTION=$(HOME)/.ssh/ssh_configured_for_bastion.$(DEPLOYMENT_ID).$(COMPONENT)
 BASTION_PUBLIC_DNS=$(shell cd ./src && $(TERRAFORM) output bastion_public_dns)
 
 
@@ -68,7 +68,7 @@ awspec: awspec-init
 awspec-init:
 	cd ./test/awspec && bundle install
 
-inspec: inspec-infrastructure # inspec-servers
+inspec: inspec-infrastructure inspec-servers
 
 inspec-init:
 	mkdir -p ./.work
@@ -89,7 +89,7 @@ inspec-servers: inspec-init $(SSH_CONFIGURED_FOR_BASTION)
 		--host=$(BASTION_PUBLIC_DNS) \
 		--user=ubuntu \
 		--backend=ssh \
-		--key-files=$(BASTION_KEYPAIR_FILE).pub \
+		--key-files=$(BASTION_KEYPAIR_FILE) \
 		--reporter=json-rspec:./.work/inspec-servers.json cli \
 		--attrs=./.work/env-attributes.yml
 
@@ -97,11 +97,12 @@ $(SSH_CONFIGURED_FOR_BASTION):
 	@echo "" >> $(HOME)/.ssh/config
 	echo "# Automatically added by the $(COMPONENT) project" >> $(HOME)/.ssh/config
 	@echo "" >> $(HOME)/.ssh/config
-	@echo "Host $(BASTION_PUBLIC_DNS)" >> $(HOME)/.ssh/config
+	@echo "Host $(DEPLOYMENT_ID)-bastion" >> $(HOME)/.ssh/config
+	@echo "  HostName $(BASTION_PUBLIC_DNS)" >> $(HOME)/.ssh/config
 	@echo "  User ubuntu" >> $(HOME)/.ssh/config
 	@echo "  IdentityFile $(shell pwd)/$(BASTION_KEYPAIR_FILE)" >> $(HOME)/.ssh/config
 	@echo "" >> $(HOME)/.ssh/config
-	@echo "Host *.$(DEPLOYMENT_ID).$(DOMAIN_NAME)" >> $(HOME)/.ssh/config
+	@echo "Host *.$(DEPLOYMENT_ID).$(BASE_DNS_DOMAIN)" >> $(HOME)/.ssh/config
 	@echo "  User ubuntu" >> $(HOME)/.ssh/config
 	@echo "  IdentityFile $(shell pwd)/$(BASTION_KEYPAIR_FILE)" >> $(HOME)/.ssh/config
 	@echo "  ProxyCommand ssh user@$(DEPLOYMENT_ID)-bastion -W %h:%p" >> $(HOME)/.ssh/config
