@@ -16,3 +16,5 @@ ARTEFACT_BUCKET_NAME=spin-artefacts-$(AWS_ACCOUNT_ID)
 
 ARTEFACT_NAME=$(COMPONENT)
 BUILD_VERSION=1.0.$(shell date +%Y%m%d%I%M%S)
+
+BASTION_KEYPAIR_FILE=.work/bastion-keypair-$(DEPLOYMENT_ID).pub

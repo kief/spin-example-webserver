@@ -13,7 +13,7 @@ describe aws_ec2_instances(state_name: 'running',
   # TODO: can we say something like 'should_only include'?
   its('image_id') { should include 'ami-63b0341a' }
   its('name') { should include "#{role}-#{deployment_id}" }
-  its('name') { should include "#{component}-#{deployment_id}" }
+  its('name') { should include "bastion-#{component}-#{deployment_id}" }
   # Redundant, but flags if I've botched the aws_ec2_instances code
   its('states') { should include 'running' }
 end
