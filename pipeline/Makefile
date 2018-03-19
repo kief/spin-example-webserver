@@ -9,7 +9,7 @@ TERRAFORM_VARS=-var repo_bucket_name=$(ARTEFACT_BUCKET_NAME)
 init:
 	cd ./src && terraform init -input=false -upgrade=true -force-copy \
 		-backend-config="bucket=$(STATE_BUCKET_NAME)" \
-		-backend-config="key=estate-$(ESTATE_ID)/component-$(COMPONENT_BASE)/pipeline/infra.tfstate" \
+		-backend-config="key=estate-$(ESTATE_ID)/component-$(COMPONENT)/pipeline/infra.tfstate" \
 		-backend-config="region=$(REGION)"
 
 plan: init ## Preview changes without applying them
@@ -30,7 +30,7 @@ run-destroy: init
 	cd ./src && terraform destroy -force $(TERRAFORM_VARS)
 
 wreck-all-environments:
-	cd ../infra && make destroy ENV=prod
+	cd ../infra && make destroy DEPLOYMENT_ID=prod
 
 clean: ## Clean local working files
 	rm -rf ./src/.terraform ./src/*tfstate*

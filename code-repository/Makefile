@@ -7,13 +7,13 @@ include $(MY_DIR)/../project-variables.mk
 TERRAFORM_VARS=-var "git_ssh_keyfile=$(HOME)/.ssh/git_ssh.pub"
 GIT_CLONE_URL="$(shell cd ./src && terraform output git_ssh_url)"
 GIT_USERNAME="$(shell cd ./src && terraform output committer_ssh_id)"
-SSH_CONFIGURED_FOR_CODECOMMIT=$(HOME)/.ssh/ssh_configured_for_codecommit_$(ESTATE_ID)_$(COMPONENT_BASE)
+SSH_CONFIGURED_FOR_CODECOMMIT=$(HOME)/.ssh/ssh_configured_for_codecommit_$(ESTATE_ID)_$(COMPONENT)
 
 
 init: $(HOME)/.ssh/git_ssh.pub
 	cd ./src && terraform init -input=false -upgrade=true -force-copy \
 		-backend-config="bucket=$(STATE_BUCKET_NAME)" \
-		-backend-config="key=estate-$(ESTATE_ID)/component-$(COMPONENT_BASE)/code-repository/infra.tfstate" \
+		-backend-config="key=estate-$(ESTATE_ID)/component-$(COMPONENT)/code-repository/infra.tfstate" \
 		-backend-config="region=$(REGION)"
 
 plan: init ## Preview changes without applying them
@@ -31,7 +31,7 @@ git-client: $(SSH_CONFIGURED_FOR_CODECOMMIT)
 
 $(SSH_CONFIGURED_FOR_CODECOMMIT): init
 	@echo "" >> $(HOME)/.ssh/config
-	echo "# Automatically added by the $(COMPONENT_BASE) project" >> $(HOME)/.ssh/config
+	echo "# Automatically added by the $(COMPONENT) project" >> $(HOME)/.ssh/config
 	echo "Host git-codecommit.*.amazonaws.com" >> $(HOME)/.ssh/config
 	@echo "  User $(GIT_USERNAME)" >> $(HOME)/.ssh/config
 	@echo "  IdentityFile ~/.ssh/git_ssh" >> $(HOME)/.ssh/config

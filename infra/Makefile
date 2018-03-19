@@ -3,14 +3,14 @@
 MY_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 include $(MY_DIR)/../project-variables.mk
 
-TERRAFORM_VARS=-var "env_name=$(ENV)" \
-	-var "allowed_cidr=$(MY_IP)/32" \
-	-var "provision_ssh_key=$(shell cat .work/keypair.pub)" \
-	-var "provision_ssh_key_file=$(shell pwd)/.work/keypair.pub" \
-	-var "component_base=$(COMPONENT_BASE)" \
+TERRAFORM_VARS=\
 	-var "estate_id=$(ESTATE_ID)" \
-	-var "public_domain_name=$(DOMAIN_NAME)" \
-	-var "private_domain_name=$(PRIVATE_DOMAIN_NAME)"
+	-var "deployment_id=$(DEPLOYMENT_ID)" \
+	-var "component=$(COMPONENT)" \
+	-var "role=$(ROLE)" \
+	-var "base_dns_domain=$(BASE_DNS_DOMAIN)" \
+	-var "allowed_cidr=$(MY_IP)/32" \
+	-var "provision_ssh_key_file=$(shell pwd)/.work/keypair.pub"
 
 # Use the terraform binary from the artefact if necessary
 TERRAFORM=$(shell which terraform)
@@ -18,7 +18,7 @@ ifeq ("$(TERRAFORM)","")
   TERRAFORM=$(MY_DIR)/../bin/terraform
 endif
 
-SSH_CONFIGURED_FOR_BASTION=$(HOME)/.ssh/ssh_configured_for_bastion.$(ENV).$(DOMAIN_NAME)
+SSH_CONFIGURED_FOR_BASTION=$(HOME)/.ssh/ssh_configured_for_bastion.$(DEPLOYMENT_ID).$(DOMAIN_NAME)
 BASTION_PUBLIC_DNS=$(shell cd ./src && $(TERRAFORM) output bastion_public_dns)
 
 
@@ -26,7 +26,7 @@ init: .work/keypair.pub
 	rm -f ./src/.terraform/*tfstate*
 	cd ./src && $(TERRAFORM) init -input=false -upgrade=true -force-copy \
 		-backend-config="bucket=$(STATE_BUCKET_NAME)" \
-		-backend-config="key=estate-$(ESTATE_ID)/component-$(COMPONENT_BASE)/environment-$(ENV)/infra.tfstate" \
+		-backend-config="key=estate-$(ESTATE_ID)/component-$(COMPONENT)/deployment-$(DEPLOYMENT_ID)/$(ROLE).tfstate" \
 		-backend-config="region=$(REGION)"
 
 .work/keypair.pub:
@@ -63,7 +63,7 @@ up: init ## Create or update the stack
 test: awspec inspec ## Test the stack
 
 awspec: awspec-init
-	cd ./test/awspec && ENV=$(ENV) bundle exec rspec spec/*_spec.rb
+	cd ./test/awspec && DEPLOYMENT_ID=$(DEPLOYMENT_ID) bundle exec rspec spec/*_spec.rb
 
 awspec-init:
 	cd ./test/awspec && bundle install
@@ -72,7 +72,7 @@ inspec: inspec-aws # inspec-servers
 
 inspec-init:
 	mkdir -p ./.work
-	echo "environment : $(ENV)" > ./.work/env-attributes.yml
+	echo "deployment_id : $(DEPLOYMENT_ID)" > ./.work/env-attributes.yml
 
 inspec-aws: inspec-init
 	inspec exec \
@@ -93,16 +93,16 @@ inspec-servers: inspec-init $(SSH_CONFIGURED_FOR_BASTION)
 
 $(SSH_CONFIGURED_FOR_BASTION):
 	@echo "" >> $(HOME)/.ssh/config
-	echo "# Automatically added by the $(COMPONENT_BASE) project" >> $(HOME)/.ssh/config
+	echo "# Automatically added by the $(COMPONENT) project" >> $(HOME)/.ssh/config
 	@echo "" >> $(HOME)/.ssh/config
 	@echo "Host $(BASTION_PUBLIC_DNS)" >> $(HOME)/.ssh/config
 	@echo "  User ubuntu" >> $(HOME)/.ssh/config
 	@echo "  IdentityFile $(shell pwd)/.work/keypair.pub" >> $(HOME)/.ssh/config
 	@echo "" >> $(HOME)/.ssh/config
-	@echo "Host *.$(ENV).$(DOMAIN_NAME)" >> $(HOME)/.ssh/config
+	@echo "Host *.$(DEPLOYMENT_ID).$(DOMAIN_NAME)" >> $(HOME)/.ssh/config
 	@echo "  User ubuntu" >> $(HOME)/.ssh/config
 	@echo "  IdentityFile $(shell pwd)/.work/keypair.pub" >> $(HOME)/.ssh/config
-	@echo "  ProxyCommand ssh user@$(ENV)-bastion -W %h:%p" >> $(HOME)/.ssh/config
+	@echo "  ProxyCommand ssh user@$(DEPLOYMENT_ID)-bastion -W %h:%p" >> $(HOME)/.ssh/config
 	@echo "" >> $(HOME)/.ssh/config
 	touch $(SSH_CONFIGURED_FOR_BASTION)
 
@@ -126,5 +126,5 @@ clean: ## Clean the local working environment, leave the stack alone
 		$(SSH_CONFIGURED_FOR_BASTION)
 
 help:
-	@echo "Set ENV= environment name instance. Defaults to \"$(ENV)\""
+	@echo "Set DEPLOYMENT_ID= environment name instance. Defaults to \"$(DEPLOYMENT_ID)\""
 	@grep -h -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'

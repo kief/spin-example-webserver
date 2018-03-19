@@ -1,16 +1,14 @@
 
 module "base-network" {
-  source  = "infrablocks/base-networking/aws"
-  version = "~> 0.1"
+  source                    = "infrablocks/base-networking/aws"
+  version                   = "~> 0.1"
+  vpc_cidr                  = "10.1.0.0/16"
+  region                    = "${var.region}"
+  availability_zones        = "${var.availability_zones}"
   
-  vpc_cidr = "10.1.0.0/16"
-  region = "${var.region}"
-
-  availability_zones = "${var.availability_zones}"
+  component                 = "${var.component}"
+  deployment_identifier     = "${var.deployment_id}"
   
-  component = "${var.component_base}-${var.env_name}"
-  deployment_identifier = "${var.env_name}"
-  include_lifecycle_events = "no"
-  
-  private_zone_id = "${module.dns-zones.private_zone_id}"
+  include_lifecycle_events  = "no"
+  private_zone_id           = "${module.dns-zones.private_zone_id}"
 }

@@ -11,7 +11,7 @@ resource "aws_codebuild_project" "simple-env-testapply-project" {
     type         = "LINUX_CONTAINER"
 
     environment_variable {
-      "name"  = "ENV"
+      "name"  = "DEPLOYMENT_ID"
       "value" = "testapply"
     }
 

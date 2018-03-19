@@ -1,6 +1,6 @@
 require 'ec2_helper'
 
-def environment_name
-  ENV['ENV']
+def deployment_id
+  ENV['DEPLOYMENT_ID']
 end
 

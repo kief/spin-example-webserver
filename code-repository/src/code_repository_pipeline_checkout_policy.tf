@@ -1,8 +1,8 @@
 
 resource "aws_iam_policy" "code_repository_pipeline_checkout_policy" {
   name        = "SimpleEnv_CodeRepository_PipelineCheckout"
-  path        = "/spin/simple_env/"
-  description = "Policy to allow pipelines to pull from the simple-env code repository"
+  path        = "/spin/simple/"
+  description = "Policy to allow pipelines to pull from the simple code repository"
 
   policy = <<POLICY
 {

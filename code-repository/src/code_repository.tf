@@ -1,4 +1,4 @@
-resource "aws_codecommit_repository" "simple-env" {
-  repository_name = "simple-env"
+resource "aws_codecommit_repository" "simplestack" {
+  repository_name = "simplestack"
   description     = "Simple reference environment"
 }
