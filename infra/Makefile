@@ -18,6 +18,11 @@ TERRAFORM=$(shell which terraform)
 ifeq ("$(TERRAFORM)","")
   TERRAFORM=$(MY_DIR)/../bin/terraform
 endif
+ifeq ("$(DEPLOYMENT_ID)","default")
+  UPGRADE_MODULES=true
+else
+  UPGRADE_MODULES=false
+endif
 
 SSH_CONFIGURED_FOR_BASTION=$(HOME)/.ssh/ssh_configured_for_bastion.$(DEPLOYMENT_ID).$(COMPONENT)
 BASTION_PUBLIC_DNS=$(shell cd ./src && $(TERRAFORM) output bastion_public_dns)
@@ -25,7 +30,7 @@ WEBSERVER_HOSTNAME=$(shell cd ./src && $(TERRAFORM) output webserver_hostname)
 
 init: $(BASTION_KEYPAIR_FILE) $(WEBSERVER_KEYPAIR_FILE)
 	rm -f ./src/.terraform/*tfstate*
-	cd ./src && $(TERRAFORM) init -input=false -upgrade=true -force-copy \
+	cd ./src && $(TERRAFORM) init -input=false -upgrade=$(UPGRADE_MODULES) -force-copy \
 		-backend-config="bucket=$(STATE_BUCKET_NAME)" \
 		-backend-config="key=estate-$(ESTATE_ID)/component-$(COMPONENT)/deployment-$(DEPLOYMENT_ID)/$(ROLE).tfstate" \
 		-backend-config="region=$(REGION)"
