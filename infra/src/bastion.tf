@@ -1,5 +1,5 @@
 module "bastion" {
-  source                = "github.com/kief/terraform-aws-bastion?ref=add_some_tags"
+  source                = "github.com/kief/terraform-aws-bastion.git?ref=add_some_tags"
   version               = "~> 0.1"
 
   region                = "${var.region}"
@@ -12,7 +12,7 @@ module "bastion" {
   ami                   = "${var.ami}"
   instance_type         = "t2.micro"
   
-  ssh_public_key_path   = "${var.provision_ssh_key_file}"
+  ssh_public_key_path   = "${var.bastion_ssh_key_file}"
   
   allowed_cidrs         = ["${split(",", module.base-network.public_subnet_cidr_blocks)}"]
   egress_cidrs          = ["${split(",", module.base-network.private_subnet_cidr_blocks)}"]
