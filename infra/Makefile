@@ -114,8 +114,9 @@ inspec-server-webserver: inspec-init $(SSH_CONFIGURED_FOR_BASTION)
 		--attrs=./.work/env-attributes.yml
 
 $(SSH_CONFIGURED_FOR_BASTION):
+	mkdir -p $(HOME)/.ssh
 	@echo "" >> $(HOME)/.ssh/config
-	echo "# Automatically added by the $(COMPONENT) project" >> $(HOME)/.ssh/config
+	@echo "# Automatically added by the $(COMPONENT) project" >> $(HOME)/.ssh/config
 	@echo "" >> $(HOME)/.ssh/config
 	@echo "Host *" >> $(HOME)/.ssh/config
 	@echo "  StrictHostKeyChecking no" >> $(HOME)/.ssh/config
