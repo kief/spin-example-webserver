@@ -1,5 +1,5 @@
 module "bastion" {
-  source                = "github.com/kief/terraform-aws-bastion.git?ref=add_some_tags"
+  source                = "github.com/kief/terraform-aws-bastion?ref=add_some_tags"
   version               = "~> 0.1"
 
   region                = "${var.region}"
