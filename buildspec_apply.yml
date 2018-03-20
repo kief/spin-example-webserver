@@ -6,9 +6,6 @@ phases:
       - apt-get update -y
       - apt-get install -y openssh-client
       - tar xzvf package/simple-stack-*.tgz
-      - echo "KSMDEBUG1"
-      - git --version
-      - echo "KSMDEBUG2"
 
   pre_build:
     commands:

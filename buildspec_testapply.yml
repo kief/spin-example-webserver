@@ -7,6 +7,9 @@ phases:
       - apt-get install -y openssh-client
       - gem install inspec
       - tar xzvf package/simple-stack-*.tgz
+      - echo "KSMDEBUG1"
+      - git --version
+      - echo "KSMDEBUG2"
 
   pre_build:
     commands:
