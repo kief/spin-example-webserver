@@ -18,7 +18,7 @@ TERRAFORM=$(shell which terraform)
 ifeq ("$(TERRAFORM)","")
   TERRAFORM=$(MY_DIR)/../bin/terraform
 endif
-ifeq ("$(DEPLOYMENT_ID)","default")
+ifeq ("$(DEPLOYMENT_ID)","sandbox")
   UPGRADE_MODULES=true
 else
   UPGRADE_MODULES=false

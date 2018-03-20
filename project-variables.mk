@@ -1,7 +1,7 @@
 
 TERRAFORM_VERSION=0.11.4
 
-DEPLOYMENT_ID?=default
+DEPLOYMENT_ID?=sandbox
 ESTATE_ID=cloudspin
 COMPONENT=simple-stack
 ROLE=webserver
