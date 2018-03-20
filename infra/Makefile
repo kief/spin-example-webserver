@@ -54,7 +54,7 @@ validate: local-init
 	cd ./src && $(TERRAFORM) validate $(TERRAFORM_VARS)
 	@echo "Apparently no complaints about the terraform file syntax"
 
-local-init: $(BASTION_KEYPAIR_FILE)
+local-init: $(BASTION_KEYPAIR_FILE) $(WEBSERVER_KEYPAIR_FILE)
 	cd ./src && $(TERRAFORM) init -backend=false -input=false -upgrade=true
 
 plan: init vars ## Preview changes without applying them
