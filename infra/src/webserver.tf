@@ -3,7 +3,7 @@ resource "aws_instance" "webserver" {
 
   ami             = "${var.ami}"
   instance_type   = "t2.micro"
-  subnet_id       = "${module.base-network.private_subnet_ids}"
+  subnet_id       = "${element(split (",", module.base-network.private_subnet_ids), 0)}"
 
   tags {
     Name                  = "${var.role}-${var.deployment_id}"
