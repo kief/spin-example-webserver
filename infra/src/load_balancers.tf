@@ -9,7 +9,7 @@ module "bastion_load_balancer" {
   component             = "${var.component}"
   deployment_identifier = "${var.deployment_id}"
   
-  domain_name           = "bastion.${var.deployment_id}.${var.component}.public.${var.base_dns_domain}"
+  domain_name           = "${var.base_dns_domain}"
   public_zone_id        = "${module.dns-zones.public_zone_id}"
   private_zone_id       = "${module.dns-zones.private_zone_id}"
   
