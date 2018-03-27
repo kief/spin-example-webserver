@@ -1,18 +1,18 @@
 
-resource "aws_iam_user" "simple_stack_committer" {
-  name = "simple_stack_committer"
+resource "aws_iam_user" "committer" {
+  name = "committer-${var.role}-${var.component}-${var.estate_id}"
 }
 
-resource "aws_iam_group_membership" "simple_stack_committer_members" {
+resource "aws_iam_group_membership" "committer_members" {
   name = "code_committers"
   users = [
-    "${aws_iam_user.simple_stack_committer.name}"
+    "${aws_iam_user.committer.name}"
   ]
-  group = "${aws_iam_group.simple_stack_committers.name}"
+  group = "${module.service-repository.committer_group_name}"
 }
 
-resource "aws_iam_user_ssh_key" "simple_stack_committer_key" {
-  username   = "${aws_iam_user.simple_stack_committer.name}"
+resource "aws_iam_user_ssh_key" "committer_key" {
+  username   = "${aws_iam_user.committer.name}"
   encoding   = "SSH"
   public_key = "${file("${var.git_ssh_keyfile}")}"
 }
