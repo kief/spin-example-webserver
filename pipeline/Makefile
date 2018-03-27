@@ -2,14 +2,21 @@
 .PHONY: test init
 
 MY_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+FUNCTION=pipeline
+DEPLOYMENT_ID=delivery
 include $(MY_DIR)/../project-variables.mk
 
-TERRAFORM_VARS=-var repo_bucket_name=$(ARTEFACT_BUCKET_NAME)
+TERRAFORM_VARS=\
+	-var "region=$(REGION)" \
+	-var "repo_bucket_name=$(ARTEFACT_BUCKET_NAME)" \
+	-var "estate_id=$(ESTATE_ID)" \
+	-var "component=$(COMPONENT)" \
+	-var "role=$(ROLE)"
 
 init:
 	cd ./src && terraform init -input=false -upgrade=true -force-copy \
 		-backend-config="bucket=$(STATE_BUCKET_NAME)" \
-		-backend-config="key=estate-$(ESTATE_ID)/component-$(COMPONENT)/pipeline/infra.tfstate" \
+		-backend-config="key=$(STATE_PATH)" \
 		-backend-config="region=$(REGION)"
 
 plan: init ## Preview changes without applying them
@@ -19,7 +26,7 @@ apply: init ## Create or update infrastructure
 	cd ./src && terraform apply -auto-approve $(TERRAFORM_VARS)
 
 test: ## Test the infrastructure
-	cd ./test && ./test-pipeline.sh
+	cd ./test && PIPELINE_NAME=$(ROLE)-$(COMPONENT)-$(ESTATE_ID)-pipeline ./test-pipeline.sh
 
 out:
 	cd ./src && terraform output $(TERRAFORM_VARS)

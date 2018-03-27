@@ -1,7 +1,7 @@
 
-resource "aws_codepipeline" "simple_stack_pipeline" {
-  name     = "simple_stack_pipeline"
-  role_arn = "${aws_iam_role.simple_stack_pipeline_role.arn}"
+resource "aws_codepipeline" "pipeline" {
+  name     = "${var.role}-${var.component}-${var.estate_id}-pipeline"
+  role_arn = "${aws_iam_role.pipeline_role.arn}"
 
   artifact_store {
     location = "${aws_s3_bucket.artefact_repository.bucket}"
@@ -22,10 +22,10 @@ resource "aws_codepipeline" "simple_stack_pipeline" {
       provider         = "CodeCommit"
       version          = "1"
 
-      output_artifacts  = [ "simple-stack-infra-source" ],
+      output_artifacts  = [ "infra-source" ],
 
       configuration {
-        RepositoryName = "simple-stack"
+        RepositoryName = "${var.role}-${var.component}-${var.estate_id}"
         BranchName     = "master"
       }
     }
@@ -41,11 +41,11 @@ resource "aws_codepipeline" "simple_stack_pipeline" {
       provider        = "CodeBuild"
       version         = "1"
 
-      input_artifacts = [ "simple-stack-infra-source" ]
-      output_artifacts  = [ "simple-stack-infra-package" ]
+      input_artifacts = [ "infra-source" ]
+      output_artifacts  = [ "infra-package" ]
 
       configuration {
-        ProjectName = "${aws_codebuild_project.simple-stack-packaging-project.name}"
+        ProjectName = "${aws_codebuild_project.packaging-project.name}"
       }
     }
   }
@@ -60,11 +60,11 @@ resource "aws_codepipeline" "simple_stack_pipeline" {
       provider        = "CodeBuild"
       version         = "1"
 
-      input_artifacts = [ "simple-stack-infra-package" ]
-      output_artifacts  = [ "simple-stack-testapply-results" ]
+      input_artifacts = [ "infra-package" ]
+      output_artifacts  = [ "testapply-results" ]
 
       configuration {
-        ProjectName = "${aws_codebuild_project.simple-stack-testapply-project.name}"
+        ProjectName = "${aws_codebuild_project.testapply-project.name}"
       }
     }
   }
@@ -91,11 +91,11 @@ resource "aws_codepipeline" "simple_stack_pipeline" {
       provider        = "CodeBuild"
       version         = "1"
 
-      input_artifacts = [ "simple-stack-infra-package" ]
-      output_artifacts  = [ "simple-stack-prodapply-results" ]
+      input_artifacts = [ "infra-package" ]
+      output_artifacts  = [ "prodapply-results" ]
 
       configuration {
-        ProjectName = "${aws_codebuild_project.simple-stack-prodapply-project.name}"
+        ProjectName = "${aws_codebuild_project.prodapply-project.name}"
       }
     }
   }

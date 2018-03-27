@@ -1,6 +1,6 @@
 
-resource "aws_iam_role" "simple_stack_packaging_codebuild_role" {
-  name = "SimpleStack_Packaging_Codebuild_Role"
+resource "aws_iam_role" "packaging_codebuild_role" {
+  name = "${var.role}-${var.component}-${var.estate_id}_Packaging_Codebuild_Role"
 
   assume_role_policy = <<EOF
 {
@@ -20,15 +20,15 @@ EOF
 
 
 resource "aws_iam_role_policy_attachment" "allow_codebuild_to_use_codecommit" {
-  role       = "${aws_iam_role.simple_stack_packaging_codebuild_role.name}"
-  policy_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/spin/simple_stack/SimpleStack_CodeRepository_PipelineCheckout"
+  role       = "${aws_iam_role.packaging_codebuild_role.name}"
+  policy_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/${var.estate_id}/${var.component}/${var.role}/${var.role}-${var.component}-${var.estate_id}_CodeRepository_PipelineCheckout"
 }
 
 
-resource "aws_iam_policy" "simple_stack_packaging_codebuild_policy" {
-  name        = "SimpleStack_Packaging_Codebuild_Policy"
+resource "aws_iam_policy" "packaging_codebuild_policy" {
+  name        = "${var.role}-${var.component}-${var.estate_id}_Packaging_Codebuild_Policy"
   path        = "/service-role/"
-  description = "Policies needed by the CodeBuild project for Packaging the SimpleStack project"
+  description = "Policies needed by the CodeBuild project for Packaging the ${var.role}-${var.component}-${var.estate_id} service"
 
   policy = <<POLICY
 {
@@ -63,9 +63,9 @@ POLICY
 }
 
 
-resource "aws_iam_policy_attachment" "simple_stack_packaging_codebuild_attachment" {
-  name       = "SimpleStack_Packaging_Codebuild_Attachment"
-  policy_arn = "${aws_iam_policy.simple_stack_packaging_codebuild_policy.arn}"
-  roles      = ["${aws_iam_role.simple_stack_packaging_codebuild_role.id}"]
+resource "aws_iam_policy_attachment" "packaging_codebuild_attachment" {
+  name       = "${var.role}-${var.component}-${var.estate_id}_Packaging_Codebuild_Attachment"
+  policy_arn = "${aws_iam_policy.packaging_codebuild_policy.arn}"
+  roles      = ["${aws_iam_role.packaging_codebuild_role.id}"]
 }
 
