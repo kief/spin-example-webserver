@@ -6,6 +6,7 @@ module "bastion" {
   vpc_id                = "${module.base-network.vpc_id}"
   subnet_ids            = ["${split(",", module.base-network.private_subnet_ids)}"]
 
+  service               = "${var.service}"
   component             = "${var.component}"
   deployment_identifier = "${var.deployment_id}"
   

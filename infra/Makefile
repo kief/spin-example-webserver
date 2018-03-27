@@ -1,13 +1,15 @@
 .DEFAULT_GOAL := help
 
 MY_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
-include $(MY_DIR)/../project-variables.mk
+FUNCTION=infrastructure
+include $(MY_DIR)/../service-configuration.mk
+include $(MY_DIR)/../shared-variables.mk
 
 TERRAFORM_VARS=\
 	-var "estate_id=$(ESTATE_ID)" \
 	-var "deployment_id=$(DEPLOYMENT_ID)" \
 	-var "component=$(COMPONENT)" \
-	-var "role=$(ROLE)" \
+	-var "service=$(SERVICE)" \
 	-var "base_dns_domain=$(BASE_DNS_DOMAIN)" \
 	-var "allowed_cidr=$(MY_IP)/32" \
 	-var "bastion_ssh_key_file=$(shell pwd)/$(BASTION_KEYPAIR_FILE).pub" \
@@ -24,7 +26,7 @@ else
   UPGRADE_MODULES=false
 endif
 
-SSH_CONFIGURED_FOR_BASTION=$(HOME)/.ssh/ssh_configured_for_bastion.$(DEPLOYMENT_ID).$(COMPONENT)
+SSH_CONFIGURED_FOR_SERVICE=$(HOME)/.ssh/ssh_configured_for_$(SERVICE).$(COMPONENT).$(DEPLOYMENT_ID)
 BASTION_PUBLIC_DNS=$(shell cd ./src && $(TERRAFORM) output bastion_public_dns)
 WEBSERVER_HOSTNAME=$(shell cd ./src && $(TERRAFORM) output webserver_hostname)
 
@@ -32,16 +34,30 @@ init: $(BASTION_KEYPAIR_FILE) $(WEBSERVER_KEYPAIR_FILE)
 	rm -f ./src/.terraform/*tfstate*
 	cd ./src && $(TERRAFORM) init -input=false -upgrade=$(UPGRADE_MODULES) -force-copy \
 		-backend-config="bucket=$(STATE_BUCKET_NAME)" \
-		-backend-config="key=estate-$(ESTATE_ID)/component-$(COMPONENT)/deployment-$(DEPLOYMENT_ID)/$(ROLE).tfstate" \
+		-backend-config="key=$(STATE_PATH)" \
 		-backend-config="region=$(REGION)"
 
 $(BASTION_KEYPAIR_FILE):
 	mkdir -p .work
 	ssh-keygen -N '' -f $(BASTION_KEYPAIR_FILE) -b 4096
 
+bastion-fingerprint:
+	@echo "Fingerprint for local file $(BASTION_KEYPAIR_FILE):"
+	@openssl rsa -in $(BASTION_KEYPAIR_FILE) -pubout -outform DER | openssl md5 -c
+	@echo "Fingerprint for remote keypair bastion-$(SERVICE)-$(COMPONENT)-$(DEPLOYMENT_ID):"
+	@aws ec2 describe-key-pairs --key-names bastion-$(SERVICE)-$(COMPONENT)-$(DEPLOYMENT_ID) \
+		| jq -r '.KeyPairs | .[0] | .KeyFingerprint'
+
 $(WEBSERVER_KEYPAIR_FILE):
 	mkdir -p .work
 	ssh-keygen -N '' -f $(WEBSERVER_KEYPAIR_FILE) -b 4096
+
+webserver-fingerprint:
+	@echo "Local ssh key fingerprint:"
+	@openssl rsa -in $(WEBSERVER_KEYPAIR_FILE) -pubout -outform DER | openssl md5 -c
+	@echo "Remote ssh key fingerprint:"
+	@aws ec2 describe-key-pairs --key-names bastion-$(SERVICE)-$(COMPONENT)-$(DEPLOYMENT_ID) \
+		| jq -r '.KeyPairs | .[0] | .KeyFingerprint'
 
 vars:
 	@echo "TERRAFORM_VARS=$(TERRAFORM_VARS)"
@@ -73,18 +89,18 @@ up: init ## Create or update the stack
 test: awspec inspec ## Test the stack
 
 awspec: awspec-init
-	cd ./test/awspec && DEPLOYMENT_ID=$(DEPLOYMENT_ID) bundle exec rspec spec/*_spec.rb
+	cd ./test/awspec && DEPLOYMENT_ID=$(DEPLOYMENT_ID) COMPONENT=$(COMPONENT) SERVICE=$(SERVICE) bundle exec rspec spec/*_spec.rb
 
 awspec-init:
 	cd ./test/awspec && bundle install
 
 inspec: inspec-infrastructure inspec-server-bastion inspec-server-webserver
 
-inspec-init:
+inspec-init: init
 	mkdir -p ./.work
 	echo "deployment_id : $(DEPLOYMENT_ID)" > ./.work/env-attributes.yml
 	echo "component : $(COMPONENT)" >> ./.work/env-attributes.yml
-	echo "role : $(ROLE)" >> ./.work/env-attributes.yml
+	echo "service : $(SERVICE)" >> ./.work/env-attributes.yml
 
 inspec-infrastructure: inspec-init
 	inspec exec \
@@ -93,7 +109,7 @@ inspec-infrastructure: inspec-init
 		--reporter json-rspec:./.work/inspec-infrastructure.json cli \
 		--attrs ./.work/env-attributes.yml
 
-inspec-server-bastion: inspec-init $(SSH_CONFIGURED_FOR_BASTION)
+inspec-server-bastion: inspec-init $(SSH_CONFIGURED_FOR_SERVICE)
 	inspec exec \
 		test/inspec/server-bastion \
 		--host=$(BASTION_PUBLIC_DNS) \
@@ -103,7 +119,7 @@ inspec-server-bastion: inspec-init $(SSH_CONFIGURED_FOR_BASTION)
 		--reporter=json-rspec:./.work/inspec-server-bastion.json cli \
 		--attrs=./.work/env-attributes.yml
 
-inspec-server-webserver: inspec-init $(SSH_CONFIGURED_FOR_BASTION)
+inspec-server-webserver: inspec-init $(SSH_CONFIGURED_FOR_SERVICE)
 	inspec exec \
 		test/inspec/server-webserver \
 		--host=$(WEBSERVER_HOSTNAME) \
@@ -113,7 +129,7 @@ inspec-server-webserver: inspec-init $(SSH_CONFIGURED_FOR_BASTION)
 		--reporter=json-rspec:./.work/inspec-server-webserver.json cli \
 		--attrs=./.work/env-attributes.yml
 
-$(SSH_CONFIGURED_FOR_BASTION):
+$(SSH_CONFIGURED_FOR_SERVICE):
 	mkdir -p $(HOME)/.ssh
 	@echo "" >> $(HOME)/.ssh/config
 	@echo "# Automatically added by the $(COMPONENT) project" >> $(HOME)/.ssh/config
@@ -122,24 +138,18 @@ $(SSH_CONFIGURED_FOR_BASTION):
 	@echo "  StrictHostKeyChecking no" >> $(HOME)/.ssh/config
 	@echo "  UserKnownHostsFile=/dev/null" >> $(HOME)/.ssh/config
 	@echo "" >> $(HOME)/.ssh/config
-	@echo "Host $(DEPLOYMENT_ID)-bastion" >> $(HOME)/.ssh/config
+	@echo "Host bastion.$(SERVICE).$(COMPONENT).$(DEPLOYMENT_ID)" >> $(HOME)/.ssh/config
 	@echo "  HostName $(BASTION_PUBLIC_DNS)" >> $(HOME)/.ssh/config
 	@echo "  User ubuntu" >> $(HOME)/.ssh/config
 	@echo "  IdentityFile $(shell pwd)/$(BASTION_KEYPAIR_FILE)" >> $(HOME)/.ssh/config
-	@echo "" >> $(HOME)/.ssh/config
-	@echo "Host *.$(DEPLOYMENT_ID).$(BASE_DNS_DOMAIN)" >> $(HOME)/.ssh/config
-	@echo "  User ubuntu" >> $(HOME)/.ssh/config
-	@echo "  IdentityFile $(shell pwd)/$(BASTION_KEYPAIR_FILE)" >> $(HOME)/.ssh/config
-	@echo "  ForwardAgent yes" >> $(HOME)/.ssh/config
-	@echo "  ProxyCommand ssh ubuntu@$(DEPLOYMENT_ID)-bastion -W %h:%p" >> $(HOME)/.ssh/config
 	@echo "" >> $(HOME)/.ssh/config
 	@echo "Host $(WEBSERVER_HOSTNAME)" >> $(HOME)/.ssh/config
 	@echo "  User ubuntu" >> $(HOME)/.ssh/config
 	@echo "  IdentityFile $(shell pwd)/$(WEBSERVER_KEYPAIR_FILE)" >> $(HOME)/.ssh/config
 	@echo "  ForwardAgent yes" >> $(HOME)/.ssh/config
-	@echo "  ProxyCommand ssh ubuntu@$(DEPLOYMENT_ID)-bastion -W %h:%p" >> $(HOME)/.ssh/config
+	@echo "  ProxyCommand ssh ubuntu@bastion.$(SERVICE).$(COMPONENT).$(DEPLOYMENT_ID) -W %h:%p" >> $(HOME)/.ssh/config
 	@echo "" >> $(HOME)/.ssh/config
-	touch $(SSH_CONFIGURED_FOR_BASTION)
+	touch $(SSH_CONFIGURED_FOR_SERVICE)
 
 update-test-gems:
 	cd ./test && bundle update
@@ -158,7 +168,7 @@ clean: ## Clean the local working environment, leave the stack alone
 		./.work \
 		./package \
 		~/.ssh/config \
-		$(SSH_CONFIGURED_FOR_BASTION)
+		$(SSH_CONFIGURED_FOR_SERVICE)
 
 help:
 	@echo "Set DEPLOYMENT_ID= environment name instance. Defaults to \"$(DEPLOYMENT_ID)\""

@@ -4,18 +4,19 @@
 MY_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 FUNCTION=code-repository
 DEPLOYMENT_ID=delivery
-include $(MY_DIR)/../project-variables.mk
+include $(MY_DIR)/../service-configuration.mk
+include $(MY_DIR)/../shared-variables.mk
 
 TERRAFORM_VARS=\
 	-var "region=$(REGION)" \
 	-var "git_ssh_keyfile=$(HOME)/.ssh/git_ssh.pub" \
 	-var "estate_id=$(ESTATE_ID)" \
 	-var "component=$(COMPONENT)" \
-	-var "role=$(ROLE)"
+	-var "service=$(SERVICE)"
 
 GIT_CLONE_URL=$(shell cd ./src && terraform output git_ssh_url)
 GIT_USERNAME=$(shell cd ./src && terraform output committer_ssh_id)
-SSH_CONFIGURED_FOR_CODECOMMIT=$(HOME)/.ssh/ssh_configured_for_codecommit_$(ROLE)-$(COMPONENT)
+SSH_CONFIGURED_FOR_CODECOMMIT=$(HOME)/.ssh/ssh_configured_for_codecommit_$(SERVICE)-$(COMPONENT)
 
 
 init: $(HOME)/.ssh/git_ssh.pub

@@ -1,11 +1,20 @@
 .DEFAULT_GOAL := help
 
 MY_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
-include $(MY_DIR)/project-variables.mk
+include $(MY_DIR)/service-configuration.mk
+include $(MY_DIR)/shared-variables.mk
 
-setup: setup-code-repository import-sourcode setup-pipeline ## Create code repo and pipeline, and import the source
+plan-delivery: plan-code-repository plan-pipeline ## See what's involved in setting up the delivery infrastructure
 
-plan-setup: plan-code-repository plan-pipeline ## See what needs doing
+apply-delivery: setup-code-repository setup-pipeline ## Setup each service project's source repo and pipelines
+
+load-delivery: load-new-repo ## Load source code into the service project repositories
+
+destroy-delivery: ## Destroy the source repos and pipelines, but not infrastructure
+	-cd pipeline && make destroy
+	-cd code-repository && make destroy
+	rm -rf infra/.git
+	@echo "WARNING: Instances of the infrastructure could still exist"
 
 build: bin/terraform ## Prepare the infrastructure code
 	cd infra && make prepare
@@ -27,17 +36,17 @@ package: local-clean build ## Create a versioned artefact
 		--exclude ./.work \
 		.
 
-plan:
+plan: ## Preview infrastructure changes to deployment $(DEPLOYMENT_ID)
 	cd infra && make plan
 
-up:
+up: ## Provision or update infrastructure for $(DEPLOYMENT_ID)
 	cd infra && make up
 
-test:
+test: ## Test infrastructure for $(DEPLOYMENT_ID)
 	cd infra && make test
 
-destroy:
-	cd infra && make destroy
+destroy: ## Destroy infrastructure for $(DEPLOYMENT_ID)
+	-cd infra && make destroy
 
 setup-code-repository:
 	cd code-repository && make apply
@@ -45,22 +54,14 @@ setup-code-repository:
 plan-code-repository:
 	cd code-repository && make plan
 
-import-sourcode:
-	cd code-repository && make import
-
-setup-pipeline:
-	cd pipeline && make apply
+load-new-repo:
+	cd code-repository && make new-repo
 
 plan-pipeline:
 	cd pipeline && make plan
 
-teardown: ## Destroys the project's source code and artefacts. Does not destroy instances of the environment!
-	# Could destroy the infra for every environment, but how?
-	# cd infra && make destroy
-	cd pipeline && make destroy
-	cd code-repository && make destroy
-	rm -rf infra/.git
-	@echo "WARNING: Instances of the infrastructure could still exist"
+setup-pipeline:
+	cd pipeline && make apply
 
 local-clean:
 	rm -rf ./package ./.work ./bin

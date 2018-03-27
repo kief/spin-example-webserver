@@ -4,14 +4,15 @@
 MY_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 FUNCTION=pipeline
 DEPLOYMENT_ID=delivery
-include $(MY_DIR)/../project-variables.mk
+include $(MY_DIR)/../service-configuration.mk
+include $(MY_DIR)/../shared-variables.mk
 
 TERRAFORM_VARS=\
 	-var "region=$(REGION)" \
 	-var "repo_bucket_name=$(ARTEFACT_BUCKET_NAME)" \
 	-var "estate_id=$(ESTATE_ID)" \
 	-var "component=$(COMPONENT)" \
-	-var "role=$(ROLE)"
+	-var "service=$(SERVICE)"
 
 init:
 	cd ./src && terraform init -input=false -upgrade=true -force-copy \
@@ -26,7 +27,10 @@ apply: init ## Create or update infrastructure
 	cd ./src && terraform apply -auto-approve $(TERRAFORM_VARS)
 
 test: ## Test the infrastructure
-	cd ./test && PIPELINE_NAME=$(ROLE)-$(COMPONENT)-$(ESTATE_ID)-pipeline ./test-pipeline.sh
+	cd ./test && PIPELINE_NAME=$(SERVICE)-$(COMPONENT)-$(ESTATE_ID)-pipeline ./test-pipeline.sh
+
+vars:
+	@echo "$(TERRAFORM_VARS)"
 
 out:
 	cd ./src && terraform output $(TERRAFORM_VARS)

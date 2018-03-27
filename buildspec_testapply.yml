@@ -6,7 +6,7 @@ phases:
       - apt-get update -y
       - apt-get install -y openssh-client
       - gem install inspec
-      - tar xzvf package/simple-stack-*.tgz
+      - tar xzvf package/*.tgz
       - git --version
 
   pre_build:

@@ -1,7 +1,7 @@
 variable "estate_id" {}
 variable "deployment_id" {}
 variable "component" {}
-variable "role" {}
+variable "service" {}
 variable "base_dns_domain" {}
 
 variable "region" { default = "eu-west-1" }

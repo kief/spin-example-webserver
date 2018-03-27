@@ -4,5 +4,5 @@ module "service-repository" {
   region    = "eu-west-1"
   estate_id = "${var.estate_id}"
   component = "${var.component}"
-  service   = "${var.role}"
+  service   = "${var.service}"
 }

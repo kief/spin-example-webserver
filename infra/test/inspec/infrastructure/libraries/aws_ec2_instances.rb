@@ -38,7 +38,7 @@ class AwsEc2Instances < Inspec.resource(1)
   def validate_params(raw_params)
     recognized_params = check_resource_param_names(
       raw_params: raw_params,
-      allowed_params: [:name, :id, :state_name, :tag_value]
+      allowed_params: [:name, :id, :state_name, :tag_value, :tag_values]
     )
     recognized_params
   end
@@ -60,6 +60,12 @@ class AwsEc2Instances < Inspec.resource(1)
     if defined? @tag_value
       (tag_key,tag_value) = @tag_value.split(':')
       filters << { name: "tag:#{tag_key}", values: [ tag_value ] }
+    end
+    if defined? @tag_values
+      @tag_values.each { |tagval|
+        (tag_key,tag_value) = tagval.split(':')
+        filters << { name: "tag:#{tag_key}", values: [ tag_value ] }
+      }
     end
     filters
   end

@@ -1,6 +1,6 @@
 
 resource "aws_iam_user" "committer" {
-  name = "committer-${var.role}-${var.component}-${var.estate_id}"
+  name = "committer-${var.service}-${var.component}-${var.estate_id}"
 }
 
 resource "aws_iam_group_membership" "committer_members" {

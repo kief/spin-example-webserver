@@ -5,7 +5,7 @@ phases:
     commands:
       - apt-get update -y
       - apt-get install -y openssh-client
-      - tar xzvf package/simple-stack-*.tgz
+      - tar xzvf package/*.tgz
 
   pre_build:
     commands:

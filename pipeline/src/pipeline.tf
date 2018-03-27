@@ -1,6 +1,6 @@
 
 resource "aws_codepipeline" "pipeline" {
-  name     = "${var.role}-${var.component}-${var.estate_id}-pipeline"
+  name     = "${var.service}-${var.component}-${var.estate_id}-pipeline"
   role_arn = "${aws_iam_role.pipeline_role.arn}"
 
   artifact_store {
@@ -25,7 +25,7 @@ resource "aws_codepipeline" "pipeline" {
       output_artifacts  = [ "infra-source" ],
 
       configuration {
-        RepositoryName = "${var.role}-${var.component}-${var.estate_id}"
+        RepositoryName = "${var.service}-${var.component}-${var.estate_id}"
         BranchName     = "master"
       }
     }

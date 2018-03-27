@@ -9,6 +9,6 @@ resource "aws_s3_bucket" "artefact_repository" {
     Name      = "artefact_repository"
     Estate    = "${var.estate_id}"
     Component = "${var.component}"
-    Role      = "${var.role}"
+    Service   = "${var.service}"
   }
 }
