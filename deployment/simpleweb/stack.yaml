@@ -4,7 +4,7 @@ vars:
   component: "%{hiera('component')}"
   deployment_identifier: "%{hiera('deployment_identifier')}"
   estate: "%{hiera('estate')}"
-  service: "webserver"
+  service: "%{hiera('service')}"
   base_dns_domain: "%{hiera('domain_name')}"
 
   webserver_ssh_public_key_path: "../ssh_keys/webserver_ssh_key.pub"
