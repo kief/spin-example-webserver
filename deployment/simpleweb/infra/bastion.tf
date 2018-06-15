@@ -8,12 +8,12 @@ module "bastion" {
 
   service               = "${var.service}"
   component             = "${var.component}"
-  deployment_identifier = "${var.deployment_id}"
+  deployment_identifier = "${var.deployment_identifier}"
   
   ami                   = "${var.ami}"
   instance_type         = "t2.micro"
   
-  ssh_public_key_path   = "${var.bastion_ssh_key_file}"
+  ssh_public_key_path   = "${var.bastion_ssh_public_key_path}"
   
   allowed_cidrs         = ["${split(",", module.base-network.public_subnet_cidr_blocks)}"]
   egress_cidrs          = ["${split(",", module.base-network.private_subnet_cidr_blocks)}"]

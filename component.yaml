@@ -1,0 +1,5 @@
+---
+estate: cloudspin
+component: simple
+service: simpleweb
+region: eu-west-1

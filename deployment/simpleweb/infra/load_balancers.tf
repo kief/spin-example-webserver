@@ -7,7 +7,7 @@ module "bastion_load_balancer" {
   subnet_ids            = ["${split(",", module.base-network.public_subnet_ids)}"]
   
   component             = "${var.service}-${var.component}"
-  deployment_identifier = "${var.deployment_id}"
+  deployment_identifier = "${var.deployment_identifier}"
   
   domain_name           = "${var.base_dns_domain}"
   public_zone_id        = "${module.dns-zones.public_zone_id}"
