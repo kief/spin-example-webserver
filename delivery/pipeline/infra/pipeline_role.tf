@@ -1,6 +1,6 @@
 
 resource "aws_iam_role" "pipeline_role" {
-  name = "${var.service}-${var.component}-${var.estate_id}-PipelineRole"
+  name = "${var.service}-${var.component}-${var.estate}-PipelineRole"
 
   assume_role_policy = <<EOF
 {
@@ -16,12 +16,6 @@ resource "aws_iam_role" "pipeline_role" {
   ]
 }
 EOF
-}
-
-
-resource "aws_iam_role_policy_attachment" "allow_codepipeline_to_use_codecommit" {
-  role       = "${aws_iam_role.pipeline_role.name}"
-  policy_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/${var.estate_id}/${var.component}/${var.service}/${var.service}-${var.component}-${var.estate_id}_CodeRepository_PipelineCheckout"
 }
 
 

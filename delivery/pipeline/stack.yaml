@@ -1,0 +1,11 @@
+---
+vars:
+  region: "%{hiera('region')}"
+  repo_bucket_name: "repo-%{hiera('estate')}-%{hiera('component')}-%{hiera('service')}"
+  component: "%{hiera('component')}"
+  estate: "%{hiera('estate')}"
+  service: "%{hiera('service')}"
+  github_owner: "%{hiera('github_owner')}"
+  github_repo: "%{hiera('github_repo')}"
+  github_branch: "%{hiera('github_branch')}"
+  github_oath_token: "%{hiera('github_oath_token')}"

@@ -3,3 +3,8 @@ estate: cloudspin
 component: simple
 service: simpleweb
 region: eu-west-1
+
+# You probably want to override these in component-local.yaml
+github_owner: cloudspinners
+github_repo: spin-simple-stack
+github_branch: master

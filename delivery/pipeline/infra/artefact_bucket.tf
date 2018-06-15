@@ -7,7 +7,7 @@ resource "aws_s3_bucket" "artefact_repository" {
   }
   tags {
     Name      = "artefact_repository"
-    Estate    = "${var.estate_id}"
+    Estate    = "${var.estate}"
     Component = "${var.component}"
     Service   = "${var.service}"
   }

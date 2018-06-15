@@ -9,3 +9,8 @@ domain_name: SOMETHING
 # Your outbound IP address. Access to your stuff in AWS will be locked down to this. 
 # You can get this with the command: curl -s icanhazip.com
 my_ip: 128.192.0.200
+
+github_owner: cloudspinners
+github_repo: spin-simple-stack
+github_branch: master
+github_oath_token: xx

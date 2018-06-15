@@ -1,6 +1,6 @@
 
 resource "aws_codepipeline" "pipeline" {
-  name     = "${var.service}-${var.component}-${var.estate_id}-pipeline"
+  name     = "${var.service}-${var.component}-${var.estate}-pipeline"
   role_arn = "${aws_iam_role.pipeline_role.arn}"
 
   artifact_store {
@@ -18,15 +18,18 @@ resource "aws_codepipeline" "pipeline" {
     action {
       name             = "Checkout"
       category         = "Source"
-      owner            = "AWS"
-      provider         = "CodeCommit"
+      owner            = "ThirdParty"
+      provider         = "GitHub"
       version          = "1"
 
       output_artifacts  = [ "infra-source" ],
 
       configuration {
-        RepositoryName = "${var.service}-${var.component}-${var.estate_id}"
-        BranchName     = "master"
+        Owner                 = "${var.github_owner}"
+        Repo                  = "${var.github_repo}"
+        PollForSourceChanges  = "yes"
+        Branch                = "${var.github_branch}"
+        OAuthToken            = "${var.github_oath_token}"
       }
     }
   }
