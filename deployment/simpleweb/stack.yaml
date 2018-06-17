@@ -15,3 +15,6 @@ ssh_keys:
   - webserver_ssh_key
   - bastion_ssh_key
 
+state:
+  type: local
+
