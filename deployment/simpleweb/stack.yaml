@@ -16,5 +16,6 @@ ssh_keys:
   - bastion_ssh_key
 
 state:
-  type: local
-
+  # type: local
+  type: s3
+  scope: deployment

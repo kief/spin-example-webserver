@@ -9,3 +9,6 @@ vars:
   github_repo: "%{hiera('github_repo')}"
   github_branch: "%{hiera('github_branch')}"
   github_oath_token: "%{hiera('github_oath_token')}"
+
+state:
+  type: local
