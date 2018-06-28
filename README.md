@@ -60,3 +60,51 @@ To manage the project as an entity, use the Makefile in the base of the **simple
 
 To manage an instance of the project (i.e. a server and its infrastructure), use the Makefile in the **simple-stack/infra** folder. Run `make` without any arguments in that folder to see how to use it.
 
+
+
+# Using rake-cloudspin
+
+## Random notes
+
+Export your PGP key for use in Terraform:
+
+```bash
+gpg --export YOUR_KEY_ID | base64
+```
+
+Decrypt secret access key output from Terraform:
+
+```bash
+echo ENCRYPTED_STRING | GPG_TTY=$(tty) base64 --decode | gpg -d
+```
+
+## Config
+
+```
+[kief_api_user]
+region = eu-west-1
+
+[profile stack_manager]
+role_arn = ${OUTPUT.STACK_MANAGER_ROLE_ARN}
+source_profile = kief_api_user
+```
+
+## Testing
+
+Should work:
+```bash
+aws --profile kief_api_user --region eu-west-1 sts get-caller-identity
+```
+
+Should not work (UnauthorizedOperation):
+```bash
+aws --profile kief_api_user --region eu-west-1 ec2 describe-instances
+```
+
+Should work:
+```bash
+aws --profile stack_manager --region eu-west-1 ec2 describe-instances
+```
+
+
+

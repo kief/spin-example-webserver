@@ -1,0 +1,8 @@
+---
+vars:
+  region: "%{hiera('region')}"
+  component: "%{hiera('component')}"
+  estate: "%{hiera('estate')}"
+
+state:
+  type: local
