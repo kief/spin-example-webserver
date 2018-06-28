@@ -2,7 +2,7 @@
 provider "aws" {
   region = "${var.region}"
   assume_role {
-    role_arn  = "arn:aws:iam::${var.aws_account_id}:role/stack_manager-${var.component}-${var.estate}"
+    role_arn  = "${var.assume_role_arn}"
     session_name = "session-${var.component}-${var.estate}"
   }
 }

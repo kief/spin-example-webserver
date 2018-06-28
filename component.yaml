@@ -3,6 +3,7 @@ estate: cloudspin
 component: simple
 service: simpleweb
 region: eu-west-1
+assume_role: true
 
 # You probably want to override these in component-local.yaml
 github_owner: cloudspinners

@@ -6,7 +6,7 @@ vars:
   estate: "%{hiera('estate')}"
   service: "%{hiera('service')}"
   base_dns_domain: "%{hiera('domain_name')}"
-  aws_account_id: "%{hiera('aws_account_id')}"
+  # aws_account_id: "%{hiera('aws_account_id')}"
 
   webserver_ssh_public_key_path: "../ssh_keys/webserver_ssh_key.pub"
   bastion_ssh_public_key_path: "../ssh_keys/bastion_ssh_key.pub"
@@ -17,8 +17,6 @@ ssh_keys:
   - bastion_ssh_key
 
 state:
-  type: local
-  # type: s3
-  # scope: deployment
-
-assume_role: true
+  # type: local
+  type: s3
+  scope: deployment

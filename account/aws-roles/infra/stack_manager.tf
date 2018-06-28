@@ -40,7 +40,8 @@ resource "aws_iam_policy" "rights_for_ssm_parameters" {
         "ssm:GetParameter",
         "ssm:GetParameters",
         "ssm:GetParametersByPath",
-        "ssm:PutParameter"
+        "ssm:PutParameter",
+        "ssm:AddTagsToResource"
       ],
       "Effect": "Allow",
       "Resource": "*"
