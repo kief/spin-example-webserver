@@ -1,10 +1,7 @@
 
-# Not using this group for anything at the moment ...
-# resource "aws_iam_group" "stack_users" {
-#   name = "stack_users-${var.component}-${var.estate}"
-#   path = "/groups/"
-# }
-
+output "stack_manager_role_arn" {
+  value = "${aws_iam_role.stack_manager.arn}"
+}
 
 # This role can be assumed by the specified user(s)
 resource "aws_iam_role" "stack_manager" {
@@ -30,20 +27,20 @@ END_ASSUME_ROLE_POLICY
 }
       # "Condition": {"Bool": {"aws:MultiFactorAuthPresent": "true"}}
 
-output "stack_manager_role_arn" {
-  value = "${aws_iam_role.stack_manager.arn}"
-}
-
-resource "aws_iam_policy" "stack_management_rights" {
-    name        = "stack_management-for--${var.component}-${var.estate}"
-    description = "Can create and destroy ${var.component} stacks in ${var.estate}"
+resource "aws_iam_policy" "rights_for_ssm_parameters" {
+    name        = "ssm-paramater-access-for-${var.component}-${var.estate}"
+    description = "Can get and put parameters for ${var.component} in ${var.estate}"
     policy = <<END_POLICY
 {
   "Version": "2012-10-17",
   "Statement": [
     {
       "Action": [
-        "ec2:Describe*"
+        "ssm:DescribeParameters",
+        "ssm:GetParameter",
+        "ssm:GetParameters",
+        "ssm:GetParametersByPath",
+        "ssm:PutParameter"
       ],
       "Effect": "Allow",
       "Resource": "*"
@@ -53,8 +50,13 @@ resource "aws_iam_policy" "stack_management_rights" {
 END_POLICY
 }
 
-resource "aws_iam_role_policy_attachment" "attach_stack_management_to_role" {
+resource "aws_iam_role_policy_attachment" "attach_sysadmin_policy_to_role" {
   role       = "${aws_iam_role.stack_manager.name}"
-  policy_arn = "${aws_iam_policy.stack_management_rights.arn}"
+  policy_arn = "arn:aws:iam::aws:policy/job-function/SystemAdministrator"
+}
+
+resource "aws_iam_role_policy_attachment" "attach_parameter_policy_to_role" {
+  role       = "${aws_iam_role.stack_manager.name}"
+  policy_arn = "${aws_iam_policy.rights_for_ssm_parameters.arn}"
 }
 

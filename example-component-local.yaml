@@ -14,3 +14,5 @@ github_owner: cloudspinners
 github_repo: spin-simple-stack
 github_branch: master
 github_oath_token: xx
+
+aws_account_id: xx
